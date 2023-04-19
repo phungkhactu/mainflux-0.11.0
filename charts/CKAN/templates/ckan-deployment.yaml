@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan
+  labels:
+    app: ckan
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-ckan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ckan
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-ckan
+  template:
+    metadata:
+      labels:
+        app: ckan
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-ckan
+    spec:
+      containers:
+      - name: ckan
+        image: "{{ .Values.ckan.image.repository }}:{{ .Values.ckan.image.tag }}"
+        imagePullPolicy: {{ .Values.ckan.image.pullPolicy }}
+        volumeMounts:
+          - mountPath: /var/lib/ckan/default
+            name: vol1
+      volumes:
+      - hostPath:
+          path: /test/shared-storage/ckan/default
+          type: ""
+        name: vol1

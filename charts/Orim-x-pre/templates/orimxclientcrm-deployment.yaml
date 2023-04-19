@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.orimxcallcenterccapi.name }}
+data:
+  {{ .Values.configmap.orimxcallcenterccapi.key }}: |
+    {{ .Values.configmap.orimxcallcenterccapi.value }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.orimxcallcenterccapi.name }}
+  labels:
+    app: {{ .Values.orimxcallcenterccapi.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxcallcenterccapi.name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxUnavailable }}
+    type: {{ .Values.upgradepolicy.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Values.orimxcallcenterccapi.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxcallcenterccapi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.orimxcallcenterccapi.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxcallcenterccapi.name }}
+    spec:
+      containers:
+      - name: {{ .Values.orimxcallcenterccapi.name }}
+        image: "{{ .Values.orimxcallcenterccapi.image.repository }}:{{ .Values.orimxcallcenterccapi.image.tag }}"
+        imagePullPolicy: {{ .Values.orimxcallcenterccapi.image.pullPolicy }}
+        env:
+        - name: TZ
+          value: {{ .Values.environment.general.TZ }}
+        volumeMounts:
+        - mountPath: {{ .Values.volume.general.volumeMounts.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts.readOnly }}
+        - mountPath: {{ .Values.volume.orimxcallcenterccapi.volumeMounts.mountPath }}
+          name: {{ .Values.volume.orimxcallcenterccapi.volumeMounts.name }}
+          subPath: {{ .Values.volume.orimxcallcenterccapi.volumeMounts.subPath }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.spec.container.securityContext.allowPrivilegeEscalation }}
+          capabilities: {{ .Values.spec.container.securityContext.capabilities }}
+          privileged: {{ .Values.spec.container.securityContext.privileged }}
+          readOnlyRootFilesystem: {{ .Values.spec.container.securityContext.readOnlyRootFilesystem }}
+          runAsNonRoot: {{ .Values.spec.container.securityContext.runAsNonRoot }}
+      hostIPC: {{ .Values.spec.hostIPC }}
+      hostPID: {{ .Values.spec.hostPID }}
+      volumes:
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes.hostPath.path }}
+          type: {{ .Values.volume.general.volumes.hostPath.type }}
+        name: {{ .Values.volume.general.volumes.name }}
+      - configMap:
+          defaultMode: {{ .Values.volume.orimxcallcenterccapi.volumes.configMap.defaultMode }}
+          name: {{ .Values.volume.orimxcallcenterccapi.volumes.configMap.name }}
+          optional: {{ .Values.volume.orimxcallcenterccapi.volumes.configMap.optional }}
+        name: {{ .Values.volume.orimxcallcenterccapi.volumes.name }}

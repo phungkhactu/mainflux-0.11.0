@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.sohoaocr.name }}
+data:
+  {{ .Values.configmap.sohoaocr.key }}: |
+    {{ .Values.configmap.sohoaocr.value }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.sohoaocr.name }}
+  labels:
+    app: {{ .Values.sohoaocr.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.sohoaocr.name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxUnavailable }}
+    type: {{ .Values.upgradepolicy.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Values.sohoaocr.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.sohoaocr.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.sohoaocr.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.sohoaocr.name }}
+    spec:
+      containers:
+      - name: {{ .Values.sohoaocr.name }}
+        image: "{{ .Values.sohoaocr.image.repository }}:{{ .Values.sohoaocr.image.tag }}"
+        imagePullPolicy: {{ .Values.sohoaocr.image.pullPolicy }}
+        env:
+        - name: TZ
+          value: {{ .Values.environment.general.TZ }}
+        volumeMounts:
+        - mountPath: {{ .Values.volume.general.volumeMounts.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts.readOnly }}
+        - mountPath: {{ .Values.volume.sohoaocr.volumeMounts.mountPath }}
+          name: {{ .Values.volume.sohoaocr.volumeMounts.name }}
+          subPath: {{ .Values.volume.sohoaocr.volumeMounts.subPath }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.spec.container.securityContext.allowPrivilegeEscalation }}
+          capabilities: {{ .Values.spec.container.securityContext.capabilities }}
+          privileged: {{ .Values.spec.container.securityContext.privileged }}
+          readOnlyRootFilesystem: {{ .Values.spec.container.securityContext.readOnlyRootFilesystem }}
+          runAsNonRoot: {{ .Values.spec.container.securityContext.runAsNonRoot }}
+      hostIPC: {{ .Values.spec.hostIPC }}
+      hostPID: {{ .Values.spec.hostPID }}
+      volumes:
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes.hostPath.path }}
+          type: {{ .Values.volume.general.volumes.hostPath.type }}
+        name: {{ .Values.volume.general.volumes.name }}
+      - configMap:
+          defaultMode: {{ .Values.volume.sohoaocr.volumes.configMap.defaultMode }}
+          name: {{ .Values.volume.sohoaocr.volumes.configMap.name }}
+          optional: {{ .Values.volume.sohoaocr.volumes.configMap.optional }}
+        name: {{ .Values.volume.sohoaocr.volumes.name }}

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-adapter
+  labels:
+    app: http-adapter
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-http-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http-adapter
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-http-adapter
+  template:
+    metadata:
+      labels:
+        app: http-adapter
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-http-adapter
+    spec:
+      containers:
+      - name: http-adapter
+        image: "{{ .Values.httpadapter.image.repository }}:{{ .Values.httpadapter.image.tag }}"
+        imagePullPolicy: {{ .Values.httpadapter.image.pullPolicy }}
+        env:
+          - name: MF_HTTP_ADAPTER_LOG_LEVEL
+            value: {{ .Values.httpadapter.logLevel }}
+          - name: MF_HTTP_ADAPTER_PORT
+            value: "8185"
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_NATS_URL
+            value: nats://nats:4222
+          - name: MF_THINGS_URL
+            value: things:8183

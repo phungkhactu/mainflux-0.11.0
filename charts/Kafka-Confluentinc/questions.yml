@@ -1,0 +1,22 @@
+rancher_max_version: 2.3.3
+categories:
+- Kafka-Confluentinc
+questions:
+- variable: defaultImage
+  default: "true"
+  description: "Use default IP Address and Port"
+  label: Use Default IP Address and Port
+  type: boolean
+  show_subquestion_if: false
+  group: "IP Address and Port"
+  subquestions:
+  - variable: service.controlcenter.externalIPs
+    default: "203.162.141.39"
+    description: "IP Address"
+    type: string
+    label: IP Address
+  - variable: service.controlcenter.http.port
+    default: "9021"
+    description: "Control Center"
+    type: string
+    label: HTTP

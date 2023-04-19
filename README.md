@@ -1,1 +1,6 @@
-# mainflux-0.11.0
+# GP2helm
+Đã hỗ trợ:
+- CKAN
+- Kafka-Confluentinc
+- SoHoa-v2
+- VNPT-OneShop-Platform-Mainflux

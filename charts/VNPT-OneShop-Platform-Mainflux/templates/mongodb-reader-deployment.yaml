@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-reader
+  labels:
+    app: mongodb-reader
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-reader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-reader
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-reader
+  template:
+    metadata:
+      labels:
+        app: mongodb-reader
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-reader
+    spec:
+      containers:
+      - name: mongodb-reader
+        image: "{{ .Values.mongodbreader.image.repository }}:{{ .Values.mongodbreader.image.tag }}"
+        imagePullPolicy: {{ .Values.mongodbreader.image.pullPolicy }}
+        env:
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_MONGO_READER_DB_HOST
+            value: {{ .Values.databases.mongodb.ip }}
+          - name: MF_MONGO_READER_DB_NAME
+            value: {{ .Values.databases.mongodb.db }}
+          - name: MF_MONGO_READER_DB_PORT
+            value: {{ .Values.databases.mongodb.port | quote }}
+          - name: MF_MONGO_READER_LOG_LEVEL
+            value: {{ .Values.mongodbreader.logLevel }}
+          - name: MF_MONGO_READER_PORT
+            value: "8904"
+          - name: MF_MONGO_READER_SERVER_CERT
+          - name: MF_MONGO_READER_SERVER_KEY
+          - name: MF_THINGS_URL
+            value: things:8183

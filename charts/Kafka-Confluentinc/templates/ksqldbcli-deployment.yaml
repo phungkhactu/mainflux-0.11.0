@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.ksqldbcli.name }}
+  labels:
+    app: {{ .Values.ksqldbcli.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldbcli.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.ksqldbcli.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldbcli.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ksqldbcli.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldbcli.name }}
+    spec:
+      containers:
+      - command: 
+          - {{ .Values.ksqldbcli.command }}
+        tty: {{ .Values.ksqldbcli.tty }}
+        name: {{ .Values.ksqldbcli.name }}
+        image: "{{ .Values.ksqldbcli.image.repository }}:{{ .Values.ksqldbcli.image.tag }}"
+        imagePullPolicy: {{ .Values.ksqldbcli.image.pullPolicy }}

@@ -1,0 +1,27 @@
+rancher_max_version: 2.3.3
+categories:
+- Mainflux
+questions:
+- variable: defaultImage
+  default: "true"
+  description: "Use default IP Address and Port"
+  label: Use Default IP Address and Port
+  type: boolean
+  show_subquestion_if: false
+  group: "IP Address and Port"
+  subquestions:
+  - variable: nginxsvc.externalIPs
+    default: "203.162.141.39"
+    description: "IP Address"
+    type: string
+    label: IP Address
+  - variable: nginxsvc.http.port
+    default: "3099"
+    description: "Nginx Reverse Proxy HTTP"
+    type: string
+    label: HTTP
+  - variable: nginxsvc.mqtt.port
+    default: "6803"
+    description: "Nginx Stream TCP MQTT"
+    type: string
+    label: MQTT

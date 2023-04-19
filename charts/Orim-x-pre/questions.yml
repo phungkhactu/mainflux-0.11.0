@@ -1,0 +1,897 @@
+rancher_max_version: 2.3.3
+categories:
+- orim-x
+questions:
+- variable: defaultImageModule
+  default: true
+  description: "Nhập thông tin phiên bản Image (staging/demo/release)"
+  label: Lựa chọn Image Module của từng Service
+  type: boolean
+  show_subquestion_if: false
+  group: "Module Image"
+  subquestions:
+  - variable: redisserver.image.tag
+    default: "staging"
+    description: "Redis server"
+    type: string
+    label: Redis server
+  - variable: livechatserver.image.tag
+    default: "staging"
+    description: "Livechat-server service"
+    type: string
+    label: Livechat-server service
+  - variable: orimxcallcenterccapi.image.tag
+    default: "staging"
+    description: "Orimx-callcenter-cc-api service"
+    type: string
+    label: Crimx-callcenter-cc-api service
+  - variable: orimxcallcenterccconnector.image.tag
+    default: "staging"
+    description: "Orimx-callcenter-cc-connector service"
+    type: string
+    label: Orimx-callcenter-cc-connector service
+  - variable: orimxhcc.image.tag
+    default: "staging"
+    description: "Orimx-hcc service"
+    type: string
+    label: Orimx-hcc service
+  - variable: orimxhttpcontentv2.image.tag
+    default: "staging"
+    description: "Orimx-httpcontent-v2 service"
+    type: string
+    label: Orimx-httpcontent-v2 service
+  - variable: orimxlivechat.image.tag
+    default: "staging"
+    description: "Orimx-livechat service"
+    type: string
+    label: Orimx-livechat service
+  - variable: orimxmasterdata.image.tag
+    default: "staging"
+    description: "Orimx-masterdata service"
+    type: string
+    label: Orimx-masterdata service
+  - variable: orimxreport.image.tag
+    default: "staging"
+    description: "Orimx-report service"
+    type: string
+    label: Orimx-report service
+  - variable: orimxreportchannel.image.tag
+    default: "staging"
+    description: "Orimx-report-channel service"
+    type: string
+    label: Orimx-report-channel service
+  - variable: orimxreportdetail.image.tag
+    default: "staging"
+    description: "Orimx-report-detail service"
+    type: string
+    label: Orimx-report-detail service
+  - variable: orimxsearch.image.tag
+    default: "staging"
+    description: "Orimx-search service"
+    type: string
+    label: Orimx-search service
+  - variable: orimxsupport.image.tag
+    default: "staging"
+    description: "Orimx-support service"
+    type: string
+    label: Orimx-support service
+- variable: defaultImageCore
+  default: true
+  description: "Nhập thông tin phiên bản Image (staging/demo/release)"
+  label: Lựa chọn Image Core của từng Service
+  type: boolean
+  show_subquestion_if: false
+  group: "Core Image"
+  subquestions:
+  - variable: mobileappstore.image.tag
+    default: "staging"
+    description: "Mobile-appstore service"
+    type: string
+    label: Mobile-appstore service
+  - variable: nginxappstore.image.tag
+    default: "staging"
+    description: "Nginx-appstore service"
+    type: string
+    label: Nginx-appstore service
+  - variable: orimxclientcrm.image.tag
+    default: "staging"
+    description: "Orimx-client-crm service"
+    type: string
+    label: Orimx-client-crm service
+  - variable: orimxclientpermission.image.tag
+    default: "staging"
+    description: "Orimx-client-permission service"
+    type: string
+    label: Orimx-client-permission service
+  - variable: orimxclientportal.image.tag
+    default: "staging"
+    description: "Orimx-client-portal service"
+    type: string
+    label: Orimx-client-portal service
+  - variable: orimxplatformpermissionv2.image.tag
+    default: "staging"
+    description: "Orimx-platform-permission-v2 service"
+    type: string
+    label: Orimx-platform-permission-v2 service
+  - variable: orimxplatformv2.image.tag
+    default: "staging"
+    description: "Orimx-platform-v2 server"
+    type: string
+    label: Orimx-platform-v2 server
+  - variable: orimxsystempermissionv2.image.tag
+    default: "staging"
+    description: "Orimx-system-permission-v2 service"
+    type: string
+    label: Orimx-system-permission-v2 service
+  - variable: redisjson2.image.tag
+    default: "staging"
+    description: "Redisjson2 service"
+    type: string
+    label: Redisjson2 service
+- variable: defaultNetworkCore
+  default: true
+  description: "Cấu Hình IP và Port Core"
+  label: Use Default IP Address and Port Core
+  type: boolean
+  show_subquestion_if: false
+  group: "IP Address and Port Core"
+  subquestions:
+  - variable: service.orimxclientcrm.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address client-crm"
+    type: string
+    label: IP Address client-crm 1
+  - variable: service.orimxclientcrm.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address client-crm"
+    type: string
+    label: IP Address client-crm 2
+  - variable: service.orimxclientcrm.http.port
+    default: "20082"
+    description: "client-crm"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxclientpermission.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address client-perm"
+    type: string
+    label: IP Address client-perm 1
+  - variable: service.orimxclientpermission.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address client-perm"
+    type: string
+    label: IP Address client-perm 2
+  - variable: service.orimxclientpermission.http.port
+    default: "25002"
+    description: "client-perm"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxclientportal.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-client-portal"
+    type: string
+    label: IP Address client-portal 1
+  - variable: service.orimxclientportal.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address client-portal"
+    type: string
+    label: IP Address client-portal 2
+  - variable: service.orimxclientportal.http.port
+    default: "20080"
+    description: "client-portal"
+    type: string
+    label: Port HTTP
+  - variable: service.nginxappstore.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address nginxappstore"
+    type: string
+    label: IP Address nginx-appstore 1
+  - variable: service.nginxappstore.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address nginx-appstore"
+    type: string
+    label: IP Address nginx-appstore 2
+  - variable: service.nginxappstore.http.port
+    default: "21080"
+    description: "nginx-appstore"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxplatformpermissionv2.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-platform-permission"
+    type: string
+    label: IP Address orimx-platform-permission 1
+  - variable: service.orimxplatformpermissionv2.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-platform-permission"
+    type: string
+    label: IP Address orimx-platform-permission 2
+  - variable: service.orimxplatformpermissionv2.http.port
+    default: "25003"
+    description: "orimx-platform-permission"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxplatformv2.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-platform"
+    type: string
+    label: IP Address orimx-platform 1
+  - variable: service.orimxplatformv2.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-platform"
+    type: string
+    label: IP Address orimx-platform 2
+  - variable: service.orimxplatformv2.http.port
+    default: "20081"
+    description: "orimx-platform"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxsystempermissionv2.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address client-crm"
+    type: string
+    label: IP Address orimx-system-permission 1
+  - variable: service.orimxsystempermissionv2.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-system-permission"
+    type: string
+    label: IP Address orimx-system-permission 2
+  - variable: service.orimxsystempermissionv2.http.port
+    default: "25004"
+    description: "orimx-system-permission"
+    type: string
+    label: Port HTTP
+  - variable: service.redisjson2.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address redisjson2"
+    type: string
+    label: IP Address redisjson2 1
+  - variable: service.redisjson2.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address client-crm"
+    type: string
+    label: IP Address redisjson2 2
+  - variable: service.redisjson2.http.port
+    default: "22222"
+    description: "redisjson2"
+    type: string
+    label: Port HTTP
+  - variable: service.mobileappstore.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address mobile-appstore"
+    type: string
+    label: IP Address mobile-appstore 1
+  - variable: service.mobileappstore.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address client-crm"
+    type: string
+    label: IP Address mobile-appstore 2
+  - variable: service.mobileappstore.http.port
+    default: "21323"
+    description: "mobile-appstore"
+    type: string
+    label: Port HTTP
+- variable: defaultNetworkModule
+  default: true
+  description: "Cấu Hình IP và Port Module"
+  label: Use Default IP Address and Port Module
+  type: boolean
+  show_subquestion_if: false
+  group: "IP Address and Port Module"
+  subquestions:
+  - variable: service.orimxcallcenterccapi.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-callcenter-cc-api"
+    type: string
+    label: IP Address orimx-callcenter-cc-api 1
+  - variable: service.orimxcallcenterccapi.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-callcenter-cc-api"
+    type: string
+    label: IP Address orimx-callcenter-cc-api 2
+  - variable: service.orimxcallcenterccapi.http.port
+    default: "20088"
+    description: "orimx-callcenter-cc-api"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxcallcenterccconnector.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-callcenter-cc-connector"
+    type: string
+    label: IP Address orimx-callcenter-cc-connector 1
+  - variable: service.orimxcallcenterccconnector.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-callcenter-cc-connector"
+    type: string
+    label: IP Address orimx-callcenter-cc-connector 2
+  - variable: service.orimxcallcenterccconnector.http.port
+    default: "21083"
+    description: "orimx-callcenter-cc-connector"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxhcc.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-hcc"
+    type: string
+    label: IP Address orimx-hcc 1
+  - variable: service.orimxhcc.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-hcc"
+    type: string
+    label: IP Address orimx-hcc 2
+  - variable: service.orimxhcc.http.port
+    default: "28086"
+    description: "orimx-hcc"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxhttpcontentv2.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-httpcontent-v2"
+    type: string
+    label: IP Address client-crm 1
+  - variable: service.orimxhttpcontentv2.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-httpcontent-v2"
+    type: string
+    label: IP Address client-crm 2
+  - variable: service.orimxhttpcontentv2.http.port
+    default: "29090"
+    description: "orimx-httpcontent-v2"
+    type: string
+    label: Port HTTP
+  - variable: service.livechatserver.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address livechat-server"
+    type: string
+    label: IP Address client-crm 1
+  - variable: service.livechatserver.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address livechat-server"
+    type: string
+    label: IP Address client-crm 2
+  - variable: service.livechatserver.http.port
+    default: "28000"
+    description: "livechat-server"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxmasterdata.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-masterdata"
+    type: string
+    label: IP Address orimx-masterdata 1
+  - variable: service.orimxmasterdata.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-masterdata"
+    type: string
+    label: IP Address orimx-masterdata 2
+  - variable: service.orimxmasterdata.http.port
+    default: "28082"
+    description: "orimx-masterdata"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxlivechat.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-livechat"
+    type: string
+    label: IP Address orimx-livechat 1
+  - variable: service.orimxlivechat.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-livechat"
+    type: string
+    label: IP Address orimx-livechat 2
+  - variable: service.orimxlivechat.http.port
+    default: "21323"
+    description: "orimx-livechat"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxsearch.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-search"
+    type: string
+    label: IP Address orimx-search 1
+  - variable: service.orimxsearch.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-search"
+    type: string
+    label: IP Address orimx-search 2
+  - variable: service.orimxsearch.http.port
+    default: "28084"
+    description: "orimx-search"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxsupport.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-support"
+    type: string
+    label: IP Address orimx-support 1
+  - variable: service.orimxsupport.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-support"
+    type: string
+    label: IP Address orimx-support 2
+  - variable: service.orimxsupport.http.port
+    default: "21324"
+    description: "orimx-support"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxreport.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-report"
+    type: string
+    label: IP Address orimx-report 1
+  - variable: service.orimxreport.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-report"
+    type: string
+    label: IP Address orimx-report 2
+  - variable: service.orimxreport.http.port
+    default: "28083"
+    description: "orimx-report"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxreportchannel.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-report-channel"
+    type: string
+    label: IP Address orimx-report-channel 1
+  - variable: service.orimxreportchannel.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-report-channel"
+    type: string
+    label: IP Address orimx-report-channel 2
+  - variable: service.orimxreportchannel.http.port
+    default: "20084"
+    description: "orimx-report-channel"
+    type: string
+    label: Port HTTP
+  - variable: service.orimxreportdetail.externalIPs.ip1
+    default: "10.159.135.71"
+    description: "IP Address orimx-report-detail"
+    type: string
+    label: IP Address orimx-report-detail 1
+  - variable: service.orimxreportdetail.externalIPs.ip2
+    default: "10.159.135.72"
+    description: "IP Address orimx-report-detail"
+    type: string
+    label: IP Address orimx-report-detail 2
+  - variable: service.orimxreportdetail.http.port
+    default: "28085"
+    description: "orimx-report-detail"
+    type: string
+    label: Port HTTP
+- variable: configMapModule
+  default: true
+  description: "Cấu Hình ConfigMap Module"
+  label: Use Default ConfigMap Module
+  type: boolean
+  show_subquestion_if: false
+  group: "ConfigMap Module"
+  subquestions:
+  - variable: configmap.livechatserver.key
+    default: "app.test"
+    description: "Thông tin Key Livechat_server"
+    type: string
+    label: Key Số Hóa Livechat-server
+  - variable: configmap.livechatserver.value
+    default: "test"
+    description: "Thông tin Value của Key Livechat-server"
+    type: string
+    label: Value Key Livechat-server
+  - variable: volume.livechatserver.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Livechat-server"
+    type: string
+    label: Mount Point Value Key Livechat-server
+  - variable: volume.livechatserver.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Livechat-server
+  - variable: configmap.orimxcallcenterccapi.key
+    default: "app.test"
+    description: "Thông tin Key orimx-callcenter-cc-api"
+    type: string
+    label: Key orimx-callcenter-cc-api
+  - variable: configmap.orimxcallcenterccapi.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-callcenter-cc-api"
+    type: string
+    label: Value Key orimx-callcenter-cc-api
+  - variable: volume.orimxcallcenterccapi.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-callcenter-cc-api"
+    type: string
+    label: Mount Point Value Key orimx-callcenter-cc-api
+  - variable: volume.orimxcallcenterccapi.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-callcenter-cc-api   
+  - variable: configmap.orimxcallcenterccconnector.key
+    default: "app.test"
+    description: "Thông tin Key orimx-callcenter-cc-connector"
+    type: string
+    label: Key orimx-callcenter-cc-connector
+  - variable: configmap.orimxcallcenterccconnector.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-callcenter-cc-connector"
+    type: string
+    label: Value Key orimx-callcenter-cc-connector
+  - variable: volume.orimxcallcenterccconnector.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-callcenter-cc-connector"
+    type: string
+    label: Mount Point Value Key orimx-callcenter-cc-connector
+  - variable: volume.orimxcallcenterccconnector.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-callcenter-cc-connector
+  - variable: configmap.orimxhcc.key
+    default: "app.test"
+    description: "Thông tin Key orimx-hcc"
+    type: string
+    label: Key orimx-hcc
+  - variable: configmap.orimxhcc.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-hcc"
+    type: string
+    label: Value Key orimx-hcc
+  - variable: volume.orimxhcc.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-hcc"
+    type: string
+    label: Mount Point Value Key orimx-hcc   
+  - variable: volume.orimxhcc.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-hcc     
+  - variable: configmap.orimxhttpcontentv2.key
+    default: "app.test"
+    description: "Thông tin Key orimx-httpcontent-v2"
+    type: string
+    label: Key orimx-httpcontent-v2
+  - variable: configmap.orimxhttpcontentv2.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-httpcontent-v2"
+    type: string
+    label: Value Key orimx-httpcontent-v2
+  - variable: volume.orimxhttpcontentv2.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-httpcontent-v2"
+    type: string
+    label: Mount Point Value Key orimx-httpcontent-v2
+  - variable: volume.orimxhttpcontentv2.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-httpcontent-v2
+  - variable: configmap.orimxlivechat.key
+    default: "app.test"
+    description: "Thông tin Key orimx-livechat"
+    type: string
+    label: Key orimx-livechat
+  - variable: configmap.orimxlivechat.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-livechat"
+    type: string
+    label: Value Key orimx-livechat
+  - variable: volume.orimxlivechat.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-livechat"
+    type: string
+    label: Mount Point Value Key orimx-livechat
+  - variable: volume.orimxlivechat.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-livechat
+  - variable: configmap.orimxmasterdata.key
+    default: "app.test"
+    description: "Thông tin Key orimx-masterdata"
+    type: string
+    label: Key orimx-masterdata
+  - variable: configmap.orimxmasterdata.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-masterdata"
+    type: string
+    label: Value Key orimx-masterdata
+  - variable: volume.orimxmasterdata.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-masterdata"
+    type: string
+    label: Mount Point Value Key orimx-masterdata
+  - variable: volume.orimxmasterdata.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-masterdata
+  - variable: configmap.orimxreport.key
+    default: "app.test"
+    description: "Thông tin Key orimx-report"
+    type: string
+    label: Key orimx-report
+  - variable: configmap.orimxreport.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-report"
+    type: string
+    label: Value Key orimx-report
+  - variable: volume.orimxreport.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-report"
+    type: string
+    label: Mount Point Value Key orimx-report
+  - variable: volume.orimxreport.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-report
+  - variable: configmap.orimxreportchannel.key
+    default: "app.test"
+    description: "Thông tin Key orimx-report-channel"
+    type: string
+    label: Key orimx-report-channel
+  - variable: configmap.orimxreportchannel.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-report-channel"
+    type: string
+    label: Value Key orimx-report-channel
+  - variable: volume.orimxreportchannel.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-report-channel"
+    type: string
+    label: Mount Point Value Key orimx-report-channel
+  - variable: volume.orimxreportchannel.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-report-channel
+  - variable: configmap.orimxreportdetail.key
+    default: "app.test"
+    description: "Thông tin Key orimx-report-detail"
+    type: string
+    label: Key orimx-report-detail
+  - variable: configmap.orimxreportdetail.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-report-detail"
+    type: string
+    label: Value Key orimx-report-detail
+  - variable: volume.orimxreportdetail.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-report-detail"
+    type: string
+    label: Mount Point Value Key orimx-report-detail
+  - variable: volume.orimxreportdetail.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-report-detail
+  - variable: configmap.orimxsearch.key
+    default: "app.test"
+    description: "Thông tin Key orimx-masterdata"
+    type: string
+    label: Key orimx-search
+  - variable: configmap.orimxsearch.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-masterdata"
+    type: string
+    label: Value Key orimx-search
+  - variable: volume.orimxsearch.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-masterdata"
+    type: string
+    label: Mount Point Value Key orimx-search
+  - variable: volume.orimxsearch.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-search
+  - variable: configmap.orimxsupport.key
+    default: "app.test"
+    description: "Thông tin Key orimx-support"
+    type: string
+    label: Key orimx-support
+  - variable: configmap.orimxsupport.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-support"
+    type: string
+    label: Value Key orimx-support
+  - variable: volume.orimxsupport.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-support"
+    type: string
+    label: Mount Point Value Key orimx-support
+  - variable: volume.orimxsupport.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-support
+- variable: configMapCore
+  default: true
+  description: "Cấu Hình ConfigMap Core"
+  label: Use Default ConfigMap Core
+  type: boolean
+  show_subquestion_if: false
+  group: "ConfigMap Core"
+  subquestions:
+  - variable: configmap.mobileappstore.key
+    default: "app.test"
+    description: "Thông tin Key mobile-appstore"
+    type: string
+    label: Key mobile-appstore
+  - variable: configmap.mobileappstore.value
+    default: "test"
+    description: "Thông tin Value của Key mobile-appstore"
+    type: string
+    label: Value Key mobile-appstore
+  - variable: volume.mobileappstore.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	mobile-appstore"
+    type: string
+    label: Mount Point Value Key mobile-appstore
+  - variable: volume.mobileappstore.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume mobile-appstore
+  - variable: configmap.nginxappstore.key
+    default: "app.test"
+    description: "Thông tin Key nginx-appstore"
+    type: string
+    label: Key nginx-appstore
+  - variable: configmap.nginxappstore.value
+    default: "test"
+    description: "Thông tin Value của Key nginx-appstore"
+    type: string
+    label: Value Key nginx-appstore
+  - variable: volume.nginxappstore.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	nginx-appstore"
+    type: string
+    label: Mount Point Value Key nginx-appstore
+  - variable: volume.nginxappstore.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume nginx-appstore
+  - variable: configmap.orimxclientcrm.key
+    default: "app.test"
+    description: "Thông tin Key orimx-client-crm"
+    type: string
+    label: Key orimx-client-crm
+  - variable: configmap.orimxclientcrm.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-client-crm"
+    type: string
+    label: Value Key orimx-client-crm
+  - variable: volume.orimxclientcrm.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-client-crm"
+    type: string
+    label: Mount Point Value Key orimx-client-crm
+  - variable: volume.orimxclientcrm.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-client-crm
+  - variable: configmap.orimxclientpermission.key
+    default: "app.test"
+    description: "Thông tin Key orimx-client-permission"
+    type: string
+    label: Key orimx-client-permission
+  - variable: configmap.orimxclientpermission.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-client-permission"
+    type: string
+    label: Value Key orimx-client-permission
+  - variable: volume.orimxclientpermission.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-client-permission"
+    type: string
+    label: Mount Point Value Key orimx-client-permission
+  - variable: volume.orimxclientpermission.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-client-permission
+  - variable: configmap.orimxclientportal.key
+    default: "app.test"
+    description: "Thông tin Key orimx-client-portal"
+    type: string
+    label: Key orimx-client-portal
+  - variable: configmap.orimxclientportal.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-client-portal"
+    type: string
+    label: Value Key orimx-client-portal
+  - variable: volume.orimxclientportal.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-client-portal"
+    type: string
+    label: Mount Point Value Key orimx-client-portal
+  - variable: volume.orimxclientportal.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-client-portal
+  - variable: configmap.orimxplatformpermissionv2.key
+    default: "app.test"
+    description: "Thông tin Key orimx-platform-permission-v2"
+    type: string
+    label: Key orimx-platform-permission-v2
+  - variable: configmap.orimxplatformpermissionv2.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-platform-permission-v2"
+    type: string
+    label: Value Key orimx-platform-permission-v2
+  - variable: volume.orimxplatformpermissionv2.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-platform-permission-v2"
+    type: string
+    label: Mount Point Value Key orimx-platform-permission-v2
+  - variable: volume.orimxplatformpermissionv2.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-platform-permission-v2
+  - variable: configmap.orimxplatformv2.key
+    default: "app.test"
+    description: "Thông tin Key orimx-platform-v2"
+    type: string
+    label: Key orimx-platform-v2
+  - variable: configmap.orimxplatformv2.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-platform-v2"
+    type: string
+    label: Value Key orimx-platform-v2
+  - variable: volume.orimxplatformv2.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-platform-v2"
+    type: string
+    label: Mount Point Value Key orimx-platform-v2
+  - variable: volume.orimxplatformv2.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-platform-v2
+  - variable: configmap.orimxsystempermissionv2.key
+    default: "app.test"
+    description: "Thông tin Key orimx-system-permission-v2"
+    type: string
+    label: Key oorimx-system-permission-v2
+  - variable: configmap.orimxsystempermissionv2.value
+    default: "test"
+    description: "Thông tin Value của Key orimx-system-permission-v2"
+    type: string
+    label: Value Key orimx-system-permission-v2
+  - variable: volume.orimxsystempermissionv2.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	orimx-system-permission-v2"
+    type: string
+    label: Mount Point Value Key oorimx-system-permission-v2
+  - variable: volume.orimxsystempermissionv2.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume orimx-system-permission-v2
+  - variable: configmap.redisjson2.key
+    default: "app.test"
+    description: "Thông tin Key redisjson2"
+    type: string
+    label: Key redisjson2
+  - variable: configmap.redisjson2.value
+    default: "test"
+    description: "Thông tin Value của Key redisjson2"
+    type: string
+    label: Value Key redisjson2
+  - variable: volume.redisjson2.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	redisjson2"
+    type: string
+    label: Mount Point Value Key redisjson2
+  - variable: volume.redisjson2.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume redisjson2

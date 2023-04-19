@@ -1,0 +1,153 @@
+environment:
+  zookeeper:
+    ZOOKEEPERCLIENTPORT: "2181"
+    ZOOKEEPERTICKTIME: "2000"
+  broker:
+    KAFKABROKERID: "1"
+    KAFKAZOOKEEPERCONNECT: "zookeeper:2181"
+    KAFKALISTENERSECURITYPROTOCOLMAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+    KAFKAADVERTISEDLISTENERS: "PLAINTEXT://broker:29092,PLAINTEXT_HOST://broker:9092"
+    KAFKAMETRICREPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+    KAFKAOFFSETSTOPICREPLICATIONFACTOR: "1"
+    KAFKAGROUPINITIALREBALANCEDELAYMS: "0"
+    KAFKACONFLUENTLICENSETOPICREPLICATIONFACTOR: "1"
+    KAFKATRANSACTIONSTATELOGMINISR: "1"
+    KAFKATRANSACTIONSTATELOGREPLICATIONFACTOR: "1"
+    CONFLUENTMETRICSREPORTERBOOTSTRAPSERVERS: "broker:29092"
+    CONFLUENTMETRICSREPORTERZOOKEEPERCONNECT: "zookeeper:2181"
+    CONFLUENTMETRICSREPORTERTOPICREPLICAS: "1"
+    CONFLUENTMETRICSENABLE: "true"
+    CONFLUENTSUPPORTCUSTOMERID: "anonymous"
+    KAFKAAUTOCREATETOPICSENABLE: "true"
+  schemaregistry:
+    SCHEMAREGISTRYHOSTNAME: "schema-registry"
+    SCHEMAREGISTRYKAFKASTORECONNECTIONURL: "zookeeper:2181"
+  connect:
+    CONNECTBOOTSTRAPSERVERS: "broker:29092"
+    CONNECTRESTADVERTISEDHOSTNAME: "connect"
+    CONNECTRESTPORT: "8083"
+    CONNECTGROUPID: "compose-connect-group"
+    CONNECTCONFIGSTORAGETOPIC: "docker-connect-configs"
+    CONNECTCONFIGSTORAGEREPLICATIONFACTOR: "1"
+    CONNECTOFFSETFLUSHINTERVALMS: "10000"
+    CONNECTOFFSETSTORAGETOPIC: "docker-connect-offsets"
+    CONNECTOFFSETSTORAGEREPLICATIONFACTOR: "1"
+    CONNECTSTATUSSTORAGETOPIC: "docker-connect-status"
+    CONNECTSTATUSSTORAGEREPLICATIONFACTOR: "1"
+    CONNECTKEYCONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+    CONNECTVALUECONVERTER: "io.confluent.connect.avro.AvroConverter"
+    CONNECTVALUECONVERTERSCHEMAREGISTRYURL: "http://schema-registry:8081"
+    CONNECTINTERNALKEYCONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    CONNECTINTERNALVALUECONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    CONNECTZOOKEEPERCONNECT: "zookeeper:2181"
+    CLASSPATH: "/usr/share/java/monitoring-interceptors/monitoring-interceptors-5.5.0.jar"
+    CONNECTPRODUCERINTERCEPTORCLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+    CONNECTCONSUMERINTERCEPTORCLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+    CONNECTPLUGINPATH: "/usr/share/java,/usr/share/confluent-hub-components"
+    CONNECTLOG4JLOGGERS: "org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR"
+  controlcenter:
+    CONTROLCENTERBOOTSTRAPSERVERS: "broker:29092"
+    CONTROLCENTERZOOKEEPERCONNECT: "zookeeper:2181"
+    CONTROLCENTERCONNECTCLUSTER: "connect:8083"
+    CONTROLCENTERKSQLKSQLDB1URL: "http://ksqldb-server:8088"
+    CONTROLCENTERKSQLKSQLDB1ADVERTISEDURL: "http://localhost:8088"
+    CONTROLCENTERSCHEMAREGISTRYURL: "http://schema-registry:8081"
+    CONTROLCENTERREPLICATIONFACTOR: "1"
+    CONTROLCENTERINTERNALTOPICSPARTITIONS: "1"
+    CONTROLCENTERMONITORINGINTERCEPTORTOPICPARTITIONS: "1"
+    CONFLUENTMETRICSTOPICREPLICATION: "1"
+    PORT: "9021" 
+  ksqldbserver:
+    KSQLCONFIGDIR: "/etc/ksql"
+    KSQLBOOTSTRAPSERVERS: "broker:29092"
+    KSQLHOSTNAME: "ksqldb-server"
+    KSQLLISTENERS: "http://0.0.0.0:8088"
+    KSQLCACHEMAXBYTESBUFFERING: "0"
+    KSQLKSQLSCHEMAREGISTRYURL: "http://schema-registry:8081"
+    KSQLPRODUCERINTERCEPTORCLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+    KSQLCONSUMERINTERCEPTORCLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+    KSQLKSQLCONNECTURL: "http://connect:8083"
+  ksqldbcli:
+  ksqldatagen:
+    KSQLCONFIGDIR: "/etc/ksql"
+    STREAMSBOOTSTRAPSERVERS: "broker:29092"
+    STREAMSSCHEMAREGISTRYHOST: "schema-registry"
+    STREAMSSCHEMAREGISTRYPORT: "8081"
+  restproxy:
+    KAFKARESTHOSTNAME: "rest-proxy"
+    KAFKARESTBOOTSTRAPSERVERS: "broker:29092"
+    KAFKARESTLISTENERS: "http://0.0.0.0:8082"
+    KAFKARESTSCHEMAREGISTRYURL: "http://schema-registry:8081"
+zookeeper:
+  image:
+    repository: "confluentinc/cp-zookeeper"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "zookeeper"
+broker:
+  image:
+    repository: "confluentinc/cp-server"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "broker"
+schemaregistry:
+  image:
+    repository: "confluentinc/cp-schema-registry"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "schema-registry"
+connect:
+  image:
+    repository: "cnfldemos/cp-server-connect-datagen"
+    tag: "0.3.2-5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "connect"
+controlcenter:
+  image:
+    repository: "confluentinc/cp-enterprise-control-center"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "control-center"
+ksqldbserver:
+  image:
+    repository: "confluentinc/cp-ksqldb-server"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "ksqldb-server"
+ksqldbcli:
+  image:
+    repository: "confluentinc/cp-ksqldb-cli"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "ksqldb-cli"
+  command: "/bin/sh"
+  tty: "true"
+ksqldatagen:
+  image:
+    repository: "confluentinc/ksqldb-examples"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "ksql-datagen"
+  args: "echo Waiting for Kafka to be ready... && \
+                     cub kafka-ready -b broker:29092 1 40 && \
+                     echo Waiting for Confluent Schema Registry to be ready... && \
+                     cub sr-ready schema-registry 8081 40 && \
+                     echo Waiting a few seconds for topic creation to finish... && \
+                     sleep 11 && \
+                     tail -f /dev/null"
+restproxy:
+  image:
+    repository: "confluentinc/cp-kafka-rest"
+    tag: "5.5.0"
+    pullPolicy: "IfNotPresent"
+  name: "rest-proxy"
+service:
+  controlcenter:
+    name: "controlcenter-svc"
+    externalIPs: "203.162.141.38"
+    namehttp: "controlcenter-svc-http"
+    http:
+      port: "9021"
+      protocol: "TCP"
+      targetPort: "9021"
+    type: "ClusterIP"

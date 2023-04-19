@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-writer-config
+data:
+  channels.toml: |
+    # If you want to listen on all channels, just pass one element ["*"], otherwise
+    # pass the list of channels.
+    [channels]
+    filter = ["*"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-writer
+  labels:
+    app: mongodb-writer
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-writer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-writer
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-writer
+  template:
+    metadata:
+      labels:
+        app: mongodb-writer
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mongodb-writer
+    spec:
+      containers:
+      - name: mongodb-writer
+        image: "{{ .Values.mongodbwriter.image.repository }}:{{ .Values.mongodbwriter.image.tag }}"
+        imagePullPolicy: {{ .Values.mongodbwriter.image.pullPolicy }}
+        env:
+          - name: MF_MONGO_WRITER_DB_HOST
+            value: {{ .Values.databases.mongodb.ip }}
+          - name: MF_MONGO_WRITER_DB_NAME
+            value: {{ .Values.databases.mongodb.db }}
+          - name: MF_MONGO_WRITER_DB_PORT
+            value: {{ .Values.databases.mongodb.port | quote }}
+          - name: MF_MONGO_WRITER_LOG_LEVEL
+            value: {{ .Values.mongodbwriter.logLevel }}
+          - name: MF_MONGO_WRITER_PORT
+            value: "8901"
+          - name: MF_NATS_URL
+            value: nats://nats:4222
+        volumeMounts:
+          - mountPath: /config/channels.toml
+            name: mongodb-writer-config
+            subPath: channels.toml
+      volumes:
+        - configMap:
+            defaultMode: 256
+            name: mongodb-writer-config
+            optional: false
+          name: mongodb-writer-config

@@ -1,0 +1,138 @@
+# Copyright (c) Mainflux
+# SPDX-License-Identifier: Apache-2.0
+
+defaults:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux"
+    tag: "latest"
+
+databases:
+  postgresql:
+    ip: "203.162.141.3"
+    username: "mainflux"
+    password: "mainflux"
+    port: "5432"
+    db:
+      users: "users"
+      authn: "authn"
+      things: "things"
+  mongodb:
+    ip: "203.162.141.3"
+    port: "27017"
+    db: "mainflux"
+  redis:
+    ip: "redis-server"
+    port: "6379"
+   
+nginx_internal:
+  mtls:
+    tls: ""
+    intermediate_crt: ""
+
+mqttadapter:
+  image:
+    repository: "tupk/mainflux-mqtt-verne"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  mqtt_port: "1884"
+  ws_port: "7777"
+  logLevel: "debug"
+
+httpadapter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-http"
+    tag: "latest"
+
+wsadapter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-ws"
+    tag: "latest"
+
+coapadapter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-coap"
+    tag: "latest"
+
+users:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-users"
+    tag: "latest"
+
+things:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-things"
+    tag: "latest"
+
+authn:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-authn"
+    tag: "latest"
+
+mongodbwriter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-mongodb-writer"
+    tag: "latest"
+
+mongodbreader:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-mongodb-reader"
+    tag: "latest"
+
+nats:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "nats"
+    tag: "1.3.0"
+
+redisserver:
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "redis"
+    tag: "5.0-alpine"
+    
+jaeger:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "jaegertracing/all-in-one"
+    tag: "1.13"
+    
+nginx:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "nginx"
+    tag: "1.16.0-alpine"
+    
+nginxsvc:
+  externalIPs: "203.162.141.39"
+  namehttp: "nginx-svc-http-port"
+  http:
+    port: "3090"
+    protocol: "TCP"
+    targetPort: "80"
+  namemqtt: "nginx-svc-mqtt-port"
+  mqtt:
+    port: "6893"
+    protocol: "TCP"
+    targetPort: "1883"
+  type: "ClusterIP"

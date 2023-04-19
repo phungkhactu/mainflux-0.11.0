@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.controlcenter.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.controlcenter.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.controlcenter.externalIPs }}
+  ports:
+  - name: {{ .Values.service.controlcenter.namehttp }}
+    port: {{ .Values.service.controlcenter.http.port }}
+    protocol: {{ .Values.service.controlcenter.http.protocol }}
+    targetPort: {{ .Values.service.controlcenter.http.targetPort }}
+  type: ClusterIP

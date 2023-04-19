@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxreportchannel.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxreportchannel.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxreportchannel.externalIPs.ip1 }}
+  - {{ .Values.service.orimxreportchannel.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxreportchannel.namehttp }}
+    port: {{ .Values.service.orimxreportchannel.http.port }}
+    protocol: {{ .Values.service.orimxreportchannel.http.protocol }}
+    targetPort: {{ .Values.service.orimxreportchannel.http.targetPort }}
+  type: ClusterIP

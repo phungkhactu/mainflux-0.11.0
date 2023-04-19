@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxcallcenterccconnector.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxcallcenterccconnector.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxcallcenterccconnector.externalIPs.ip1 }}
+  - {{ .Values.service.orimxcallcenterccconnector.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxcallcenterccconnector.namehttp }}
+    port: {{ .Values.service.orimxcallcenterccconnector.http.port }}
+    protocol: {{ .Values.service.orimxcallcenterccconnector.http.protocol }}
+    targetPort: {{ .Values.service.orimxcallcenterccconnector.http.targetPort }}
+  type: ClusterIP

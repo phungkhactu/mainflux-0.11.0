@@ -1,0 +1,22 @@
+rancher_max_version: 2.3.3
+categories:
+- CKAN
+questions:
+- variable: defaultImage
+  default: "true"
+  description: "Use default Docker images"
+  label: Use Default Images
+  type: boolean
+  show_subquestion_if: false
+  group: "Container Images"
+  subquestions:
+  - variable: ckan.image.repository
+    default: "tupk/opendata-ckan"
+    description: "Docker image name"
+    type: string
+    label: Image Name
+  - variable: ckan.image.tag
+    default: "dev"
+    description: "Docker image tag"
+    type: string
+    label: Image Tag

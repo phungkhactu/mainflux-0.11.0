@@ -1,0 +1,203 @@
+rancher_max_version: 2.3.3
+categories:
+- sohoa-v2
+questions:
+- variable: defaultImage
+  default: true
+  description: "Nhập thông tin phiên bản Image (dev/demo/release)"
+  label: Lựa chọn Image của từng Service
+  type: boolean
+  show_subquestion_if: false
+  group: "Container Image"
+  subquestions:
+  - variable: redisserver.image.tag
+    default: "alpine"
+    description: "Redis server"
+    type: string
+    label: Redis server
+  - variable: sohoabackend.image.tag
+    default: "dev"
+    description: "Số Hóa Back-End service"
+    type: string
+    label: Số Hóa Back-End service
+  - variable: sohoafrontend.image.tag
+    default: "dev"
+    description: "Số Hóa Front-End service"
+    type: string
+    label: Số Hóa Front-End service
+  - variable: sohoafrontendpublic.image.tag
+    default: "dev"
+    description: "Số Hóa Front-End-Public service"
+    type: string
+    label: Số Hóa Front-End-Public service
+  - variable: sohoaocr.image.tag
+    default: "dev"
+    description: "Số Hóa OCR service"
+    type: string
+    label: Số Hóa OCR service
+  - variable: sohoaroleandpermission.image.tag
+    default: "dev"
+    description: "Số Hóa Role and Permission service"
+    type: string
+    label: Số Hóa Role and Permission service
+  - variable: sohoasearchengine.image.tag
+    default: "dev"
+    description: "Số Hóa Search Engine service"
+    type: string
+    label: Số Hóa Search Engine service
+- variable: defaultNetwork
+  default: true
+  description: "Cấu Hình IP và Port"
+  label: Use Default IP Address and Port 
+  type: boolean
+  show_subquestion_if: false
+  group: "IP Address and Port"
+  subquestions:
+  - variable: service.sohoafrontendpublic.externalIPs
+    default: "203.162.141.38"
+    description: "IP Address Front-End-Public"
+    type: string
+    label: IP Address Front-End-Public
+  - variable: service.sohoafrontendpublic.http.port
+    default: "8005"
+    description: "Front-End-Public"
+    type: string
+    label: Port HTTP
+  - variable: service.sohoafrontend.externalIPs
+    default: "203.162.141.38"
+    description: "IP Address Front-End"
+    type: string
+    label: IP Address Front-End
+  - variable: service.sohoafrontend.http.port
+    default: "4300"
+    description: "Front-End"
+    type: string
+    label: Port HTTP
+- variable: configMap
+  default: true
+  description: "Cấu Hình ConfigMap"
+  label: Use Default ConfigMap
+  type: boolean
+  show_subquestion_if: false
+  group: "ConfigMap"
+  subquestions:
+  - variable: configmap.sohoabackend.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa Backend"
+    type: string
+    label: Key Số Hóa Backend
+  - variable: configmap.sohoabackend.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa Backend"
+    type: string
+    label: Value Key Số Hóa Backend
+  - variable: volume.sohoabackend.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa Backend"
+    type: string
+    label: Mount Point Value Key Số Hóa Backend
+  - variable: volume.sohoabackend.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa Backend    
+  - variable: configmap.sohoafrontend.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa Frontend"
+    type: string
+    label: Key Số Hóa Frontend
+  - variable: configmap.sohoafrontend.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa Frontend"
+    type: string
+    label: Value Key Số Hóa Frontend
+  - variable: volume.sohoafrontend.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa Frontend"
+    type: string
+    label: Mount Point Value Key Số Hóa Frontend 
+  - variable: volume.sohoafrontend.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa Frontend   
+  - variable: configmap.sohoafrontendpublic.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa Frontend Public"
+    type: string
+    label: Key Số Hóa Frontend Public
+  - variable: configmap.sohoafrontendpublic.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa Frontend Public"
+    type: string
+    label: Value Key Số Hóa Frontend Public
+  - variable: volume.sohoafrontendpublic.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa Frontend Public"
+    type: string
+    label: Mount Point Value Key Số Hóa Frontend Public
+  - variable: volume.sohoafrontendpublic.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa Frontend Public 
+  - variable: configmap.sohoaocr.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa ORC"
+    type: string
+    label: Key Số Hóa OCR
+  - variable: configmap.sohoaocr.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa OCR"
+    type: string
+    label: Value Key Số Hóa ORC
+  - variable: volume.sohoaocr.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa ORC"
+    type: string
+    label: Mount Point Value Key Số Hóa ORC   
+  - variable: volume.sohoaocr.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa ORC      
+  - variable: configmap.sohoaroleandpermission.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa Role and Permission"
+    type: string
+    label: Key Số Hóa Role and Permission
+  - variable: configmap.sohoaroleandpermission.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa Role and Permission"
+    type: string
+    label: Value Key Số Hóa Role and Permission
+  - variable: volume.sohoaroleandpermission.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa Role and Permission"
+    type: string
+    label: Mount Point Value Key Số Hóa Role and Permission 
+  - variable: volume.sohoaroleandpermission.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa Role and Permission 
+  - variable: configmap.sohoasearchengine.key
+    default: "app.test"
+    description: "Thông tin Key Số Hóa Search Engine"
+    type: string
+    label: Key Số Hóa Search Engine
+  - variable: configmap.sohoasearchengine.value
+    default: "test"
+    description: "Thông tin Value của Key Số Hóa Search Engine"
+    type: string
+    label: Value Key Số Hóa Search Engine
+  - variable: volume.sohoasearchengine.volumeMounts.mountPath
+    default: "/app/app.test"
+    description: "Thông tin Mount Point	Số Hóa Search Enginen"
+    type: string
+    label: Mount Point Value Key Số Hóa Search Engine
+  - variable: volume.sohoasearchengine.volumeMounts.subPath
+    default: "app.test"
+    description: "Thông tin Sub Path in Volume"
+    type: string
+    label: Sub Path in Volume Số Hóa Search Engine

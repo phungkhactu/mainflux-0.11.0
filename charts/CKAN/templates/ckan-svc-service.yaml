@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-svc
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:ckan"]'
+spec:
+  externalIPs:
+  - {{ .Values.ckansvc.externalIPs }}
+  ports:
+  - name: {{ .Values.ckansvc.name }}
+    port: {{ .Values.ckansvc.port }}
+    protocol: {{ .Values.ckansvc.protocol }}
+    targetPort: {{ .Values.ckansvc.targetPort }}
+  type: {{ .Values.ckansvc.type }}
+status:
+  loadBalancer: {}

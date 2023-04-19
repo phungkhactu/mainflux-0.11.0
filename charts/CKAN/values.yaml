@@ -1,0 +1,22 @@
+defaults:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/opendata-ckan:dev"
+    tag: "latest"
+ckan:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/opendata-ckan"
+    tag: "dev"
+ckansvc:
+  name: "ckan-svc-http-port"
+  externalIPs: "203.162.141.37"
+  port: "18081"
+  protocol: "TCP"
+  targetPort: "8080"
+  type: "ClusterIP"
+volume:
+  volumeMounts:
+  

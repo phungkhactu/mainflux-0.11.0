@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  labels:
+    app: jaeger
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-jaeger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-jaeger
+    spec:
+      containers:
+      - name: jaeger
+        image: "{{ .Values.jaeger.image.repository }}:{{ .Values.jaeger.image.tag }}"
+        imagePullPolicy: {{ .Values.jaeger.image.pullPolicy }}

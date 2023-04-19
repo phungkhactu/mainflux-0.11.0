@@ -1,0 +1,629 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dhparam.pem
+data:
+  dhparam.pem: |
+    -----BEGIN DH PARAMETERS-----
+    MIIBCAKCAQEAquN8NRcSdLOM9RiumqWH8Jw3CGVR/eQQeq+jvT3zpxlUQPAMExQb
+    MRCspm1oRgDWGvch3Z4zfMmBZyzKJA4BDTh4USzcE5zvnx8aUcUPZPQpwSicKgzb
+    QGnl0Xf/75GAWrwhxn8GNyMP29wrpcd1Qg8fEQ3HAW1fCd9girKMKY9aBaHli/h2
+    R9Rd/KTbeqN88aoMjUvZHooIIZXu0A+kyulOajYQO4k3Sp6CBqv0FFcoLQnYNH13
+    kMUE5qJ68U732HybTw8sofTCOxKcCfM2kVP7dVoF3prlGjUw3z3l3STY8vuTdq0B
+    R7PslkoQHNmqcL+2gouoWP3GI+IeRzGSSwIBAg==
+    -----END DH PARAMETERS-----
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx.conf.template
+data:
+  nginx.conf.template: |
+    user nginx;
+    worker_processes auto;
+    worker_cpu_affinity auto;
+    pid /run/nginx.pid;
+    include /etc/nginx/modules-enabled/*.conf;
+    events {
+        # Explanation: https://serverfault.com/questions/787919/optimal-value-for-nginx-worker-connections
+        # We'll keep 10k connections per core (assuming one worker per core)
+        worker_connections 10000;
+    }
+    http {
+        include snippets/http_access_log.conf;
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+        # Include single-node or multiple-node (cluster) upstream
+        include snippets/mqtt-ws-upstream-cluster-edit.conf; #mqtt-ws-upstream.conf (Goc)
+        server {
+            listen 80 default_server;
+            listen [::]:80 default_server;
+            listen 443 ssl http2 default_server;
+            listen [::]:443 ssl http2 default_server;
+            include snippets/ssl.conf;
+            add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
+            add_header X-Frame-Options DENY;
+            add_header X-Content-Type-Options nosniff;
+        #    add_header Access-Control-Allow-Origin '*';
+        #    add_header Access-Control-Allow-Methods '*';
+        #    add_header Access-Control-Allow-Headers '*';
+            # Proxy pass to users service
+            location ~ ^/(users|tokens|vnpt-sso-tokens) {
+                include snippets/proxy-headers.conf;
+                proxy_pass http://users:${MF_USERS_HTTP_PORT};
+            }
+            # Proxy pass to things service
+            location ~ ^/(things|channels|connect) {
+                include snippets/proxy-headers.conf;
+                add_header Access-Control-Expose-Headers Location;
+                proxy_pass http://things:${MF_THINGS_HTTP_PORT};
+            }
+            location /version {
+                include snippets/proxy-headers.conf;
+                proxy_pass http://things:${MF_THINGS_HTTP_PORT};
+            }
+            # Proxy pass to mainflux-http-adapter
+            location /http/ {
+                include snippets/proxy-headers.conf;
+                # Trailing `/` is mandatory. Refer to the http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass
+                # If the proxy_pass directive is specified with a URI, then when a request is passed to the server,
+                # the part of a normalized request URI matching the location is replaced by a URI specified in the directive
+                proxy_pass http://http-adapter:${MF_HTTP_ADAPTER_PORT}/;
+            }
+            # Proxy pass to mainflux-ws-adapter
+            location /ws/ {
+                include snippets/proxy-headers.conf;
+                include snippets/ws-upgrade.conf;
+                proxy_pass http://ws-adapter:${MF_WS_ADAPTER_PORT}/;
+            }
+            # Proxy pass to mainflux-mqtt-adapter over WS
+            location /mqtt {
+                include snippets/proxy-headers.conf;
+                include snippets/ws-upgrade.conf;
+                proxy_pass http://mqtt_ws_cluster/mqtt;
+            }
+        }
+    }
+    # MQTT
+    stream {
+       include snippets/stream_access_log.conf;
+        # Include single-node or multiple-node (cluster) upstream
+        include snippets/mqtt-upstream-cluster-edit.conf; #mqtt-upstream.conf (Goc)
+        server {
+            listen 1883;
+            listen [::]:1883;
+            listen 8883 ssl;
+            listen [::]:8883 ssl;
+            include snippets/ssl.conf;
+            proxy_pass mqtt_cluster;
+        }
+    }
+    error_log info.log info;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: entrypoint.sh
+data:
+  entrypoint.sh: |
+    #!/bin/ash
+    #if [ -z "$MF_MQTT_CLUSTER" ]
+    #then
+    #      envsubst '${MF_MQTT_ADAPTER_PORT}' < /etc/nginx/snippets/mqtt-upstream-single.conf > /etc/nginx/snippets/mqtt-upstream.conf
+    #      envsubst '${MF_MQTT_ADAPTER_WS_PORT}' < /etc/nginx/snippets/mqtt-ws-upstream-single.conf > /etc/nginx/snippets/mqtt-ws-upstream.conf
+    #else
+    #      envsubst '${MF_MQTT_ADAPTER_PORT}' < /etc/nginx/snippets/mqtt-upstream-cluster.conf > /etc/nginx/snippets/mqtt-upstream.conf
+    #      envsubst '${MF_MQTT_ADAPTER_WS_PORT}' < /etc/nginx/snippets/mqtt-ws-upstream-cluster.conf > /etc/nginx/snippets/mqtt-ws-upstream.conf
+    #fi
+    envsubst '
+        ${MF_USERS_HTTP_PORT}
+        ${MF_THINGS_HTTP_PORT}
+        ${MF_THINGS_HTTP_PORT}
+        ${MF_HTTP_ADAPTER_PORT}
+        ${MF_WS_ADAPTER_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+    exec nginx -g "daemon off;"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: snippets
+data:
+  http_access_log.conf: |
+    log_format access_log_format 'HTTP/WS '
+                                 '$remote_addr: '
+                                 '"$request" $status; '
+                                 'request time=$request_time upstream connect time=$upstream_connect_time upstream response time=$upstream_response_time';
+    access_log access.log access_log_format;
+  mqtt-upstream-cluster.conf: |
+    upstream mqtt_cluster {
+        least_conn;
+        server mqtt-adapter-1:${MF_MQTT_ADAPTER_PORT};
+        server mqtt-adapter-2:${MF_MQTT_ADAPTER_PORT};
+        server mqtt-adapter-3:${MF_MQTT_ADAPTER_PORT};
+    }
+  mqtt-upstream-single.conf: |
+    upstream mqtt_cluster {
+            server mqtt-adapter:${MF_MQTT_ADAPTER_PORT};
+    }
+  mqtt-ws-upstream-cluster.conf: |
+    upstream mqtt_ws_cluster {
+        least_conn;
+        server mqtt-adapter-1:${MF_MQTT_ADAPTER_WS_PORT};
+        server mqtt-adapter-2:${MF_MQTT_ADAPTER_WS_PORT};
+        server mqtt-adapter-3:${MF_MQTT_ADAPTER_WS_PORT};
+    }
+  mqtt-ws-upstream-single.conf: |
+    upstream mqtt_ws_cluster {
+            server mqtt-adapter:${MF_MQTT_ADAPTER_WS_PORT};
+    }
+  proxy-headers.conf: |
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    # Allow OPTIONS method CORS
+    if ($request_method = OPTIONS) {
+        add_header Content-Length 0;
+        add_header Content-Type text/plain;
+        return 200;
+    }
+  ssl-client.conf: |
+    ssl_client_certificate /etc/ssl/certs/ca.crt;
+    ssl_verify_depth 2;
+  ssl.conf: |-
+    ssl_certificate /etc/ssl/certs/mainflux-server.crt;
+    ssl_certificate_key /etc/ssl/private/mainflux-server.key;
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+    ssl_ecdh_curve secp384r1;
+    ssl_session_tickets off;
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout 5s;
+  stream_access_log.conf: |
+    log_format access_log_format '$protocol '
+                                 '$remote_addr: '
+                                 'status=$status; upstream connect time=$upstream_connect_time';
+    access_log access.log access_log_format;
+  verify-ssl-client.conf: |
+    if ($ssl_client_verify != SUCCESS) {
+        return 403;
+    }
+    if ($auth_key = '') {
+        return 403;
+    }
+  ws-upgrade.conf: |
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_connect_timeout 7d;
+    proxy_send_timeout 7d;
+    proxy_read_timeout 7d;
+  mqtt-upstream-cluster-edit.conf: |
+    upstream mqtt_cluster {
+      least_conn;
+      server mqtt-adapter-1:1883;
+      server mqtt-adapter-2:1883;
+      server mqtt-adapter-3:1883;
+    }
+  mqtt-ws-upstream-cluster-edit.conf: |
+    upstream mqtt_ws_cluster {
+      least_conn;
+      server mqtt-adapter-1:8080;
+      server mqtt-adapter-2:8080;
+      server mqtt-adapter-3:8080;
+    }
+  mqtt-upstream-single-edit.conf: |
+    upstream mqtt_cluster {
+      server mqtt-adapter:1883;
+    }
+  mqtt-ws-upstream-single-edit.conf: |
+    upstream mqtt_ws_cluster {
+      server mqtt-adapter:8080;
+    }  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authorization.js
+data:
+  authorization.js: |
+    var clientKey = '';
+    // Check certificate MQTTS.
+    function authenticate(s) {
+        if (!s.variables.ssl_client_s_dn || !s.variables.ssl_client_s_dn.length ||
+            !s.variables.ssl_client_verify || s.variables.ssl_client_verify != "SUCCESS") {
+            s.deny();
+            return
+        }
+        s.on('upload', function (data) {
+            if (data == '') {
+                return;
+            }
+            var packet_type_flags_byte = data.codePointAt(0);
+            // First MQTT packet contain message type and flags. CONNECT message type
+            // is encoded as 0001, and we're not interested in flags, so only values
+            // 0001xxxx (which is between 16 and 32) should be checked.
+            if (packet_type_flags_byte < 16 || packet_type_flags_byte >= 32) {
+                s.off('upload');
+                s.allow();
+                return;
+            }
+            if (clientKey === '') {
+                clientKey = parseCert(s.variables.ssl_client_s_dn, 'CN');
+            }
+            var pass = parsePackage(s, data);
+            if (!clientKey.length || pass !== clientKey) {
+                s.error('Cert CN (' + clientKey + ') does not match client password');
+                s.off('upload')
+                s.deny();
+                return;
+            }
+            s.off('upload');
+            s.allow();
+        })
+    }
+    function parsePackage(s, data) {
+        // An explanation of MQTT packet structure can be found here:
+        // https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#msg-format. 
+        // CONNECT message is explained here:
+        // https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#connect.
+        /*
+            0               1               2               3
+            7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            | TYPE | RSRVD | REMAINING LEN |      PROTOCOL NAME LEN       |
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            |                        PROTOCOL NAME                        |    
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
+            |    VERSION   |     FLAGS     |          KEEP ALIVE          | 
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
+            |                     Payload (if any) ...                    |
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            First byte with remaining length represents fixed header.
+            Remaining Length is the length of the variable header (10 bytes) plus the length of the Payload.
+            It is encoded in the manner described here:
+            http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180836. 
+            Connect flags byte looks like this:   
+            |       7       |       6       |       5     |   4  3   |     2     |       1       |     0     |
+            | Username Flag | Password Flag | Will Retain | Will QoS | Will Flag | Clean Session | Reserved  |
+            The payload is determined by the flags and comes in this order:
+                1. Client ID (2 bytes length + ID value)
+                2. Will Topic (2 bytes length + Will Topic value) if Will Flag is 1.
+                3. Will Message (2 bytes length + Will Message value) if Will Flag is 1.
+                4. User Name (2 bytes length + User Name value) if User Name Flag is 1.
+                5. Password (2 bytes length + Password value) if Password Flag is 1.
+            
+            This method extracts Password field.
+        */
+        // Extract variable length header. It's 1-4 bytes. As long as continuation byte is
+        // 1, there are more bytes in this header. This algorithm is explained here:
+        // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180836
+        var len_size = 1;
+        for (var remaining_len = 1; remaining_len < 5; remaining_len++) {
+            if (data.codePointAt(remaining_len) > 128) {
+                len_size += 1;
+                continue;
+            }
+            break;
+        }
+        // CONTROL(1) + MSG_LEN(1-4) + PROTO_NAME_LEN(2) + PROTO_NAME(4) + PROTO_VERSION(1)
+        var flags_pos = 1 + len_size + 2 + 4 + 1;
+        var flags = data.codePointAt(flags_pos);
+        // If there are no username and password flags (11xxxxxx), return.
+        if (flags < 192) {
+            s.error('MQTT username or password not provided');
+            return '';
+        }
+        // FLAGS(1) + KEEP_ALIVE(2)
+        var shift = flags_pos + 1 + 2;
+        // Number of bytes to encode length.
+        var len_bytes_num = 2;
+        // If Wil Flag is present, Will Topic and Will Message need to be skipped as well.
+        var shift_flags = 196 <= flags ? 5 : 3;
+        var len_msb, len_lsb, len;
+        for (var i = 0; i < shift_flags; i++) {
+            len_msb = data.codePointAt(shift).toString(16);
+            len_lsb = data.codePointAt(shift + 1).toString(16);
+            len = calcLen(len_msb, len_lsb);
+            shift += len_bytes_num;
+            if (i != shift_flags - 1) {
+                shift += len;
+            }
+        }
+        var password = data.substring(shift, shift + len);
+        return password;
+    }
+    // Check certificate HTTPS and WSS.
+    function setKey(r) {
+        if (clientKey === '') {
+            clientKey = parseCert(r.variables.ssl_client_s_dn, 'CN');
+        }
+        var auth = r.headersIn['Authorization'];
+        if (auth && auth.length && auth != clientKey) {
+            r.error('Authorization header does not match certificate');
+            return '';
+        }
+        if (r.uri.startsWith('/ws') && (!auth || !auth.length)) {
+            var a;
+            for (a in r.args) {
+                if (a == 'authorization' && r.args[a] === clientKey) {
+                    return clientKey;
+                }
+            }
+            r.error('Authorization param does not match certificate');
+            return '';
+        }
+        return clientKey;
+    }
+    function calcLen(msb, lsb) {
+        if (lsb < 2) {
+            lsb = '0' + lsb;
+        }
+        return parseInt(msb + lsb, 16);
+    }
+    function parseCert(cert, key) {
+        if (cert.length) {
+            var pairs = cert.split(',');
+            for (var i = 0; i < pairs.length; i++) {
+                var pair = pairs[i].split('=');
+                if (pair[0].toUpperCase() == key) {
+                    return pair[1];
+                }
+            }
+        }
+        return '';
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mainflux-server.crt
+data:
+  mainflux-server.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIEOjCCAyICFCcgfqlRnT0lLgivo40jvyko/V4fMA0GCSqGSIb3DQEBCwUAMFcx
+    EjAQBgNVBAMMCWxvY2FsaG9zdDERMA8GA1UECgwITWFpbmZsdXgxDDAKBgNVBAsM
+    A0lvVDEgMB4GCSqGSIb3DQEJARYRaW5mb0BtYWluZmx1eC5jb20wHhcNMTkwNDAx
+    MDkyNzA1WhcNMjExMjI2MDkyNzA1WjBcMRIwEAYDVQQDDAlsb2NhbGhvc3QxETAP
+    BgNVBAoMCE1haW5mbHV4MREwDwYDVQQLDAhtYWluZmx1eDEgMB4GCSqGSIb3DQEJ
+    ARYRaW5mb0BtYWluZmx1eC5jb20wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK
+    AoICAQD1LayMnOYlTHWkK/7BIc2nRLkfkbfyejIujEKIuOPYZ1DbG36VeSM1MYlp
+    zl+E7gJvvK1RuCcL4DKG0uExI6HV2GdEq9kSe3Pj/512VTq+bXvMDRTcHMUkaN0N
+    J7GybHNk8J3fmFlB61zUpZUNy0M14YYX8tZRMMw8Ke6ThJyj8ulSky4Cp2tfiGK9
+    +YLP/UJkSm+0EOVAOMAtLNvXtg5+/0e63M+stdf+F3txLuiYXiOG399tXlI61r4L
+    5fKs0xau6P1V5uEPwAnQiXYVLCdahfGrUJIjHnHTU0TS2EpE8OxAu0krzQeONGSU
+    g6SMM8vCP0d8yqQrYZGkmaFmIiTgOmy/fs+8u/ykautiOR/SviTR3hi/ofjZ+NTd
+    T2Udg98BGuZBwKw+elajHUSUEkxtJVxeuFiVGzZNXkEhuxU6VNCnPeXxtl502rU9
+    nmhmO2WJ0/1KX+oe/uTC99b+olEPm72exsX0mwkSpIwDRBpX9meER4vJe4yX9fmo
+    tqEC2G30C9KYn+STcY9P7jptJgLLuN61DVBjeMPLW+0NTjqmtplcu73zYvyCsG4r
+    hIhY291wvz18iNLY7BfehU3beEx68ApdLMue6xi9JlFKxHf5FHBnBSvD2xrR47rH
+    9UMOHLglB+QkoidQ3KugHJ8r1sVHPhuS8mE7cENReFoNfh+N2wIDAQABMA0GCSqG
+    SIb3DQEBCwUAA4IBAQARH5ZD86TPaKW7Dty1bAnj1owp0o+DOp65hGZOZ2AqYVDF
+    UMz46ahAuBWhHPIiSkBnonBL5xVV3qihhlISaOQKe2FPdt/ekhUTzI/upAZDphN0
+    m4ZNllXaHAA0IQpXp3O/An6/IhrLCGLth9pnIzswi6sF+I5nIfpcuAV7TJfLUAG+
+    UTjy8GsZhE/ZCx0JSYzhpC1mDGxtyCQR7QY7rnEohXv0bHmv/jVVIZenT2SZZHJ5
+    sQEiaIZWbpHctpgbom1qi5BNmIz9APKus3f8ACGuMLOHiW1u6I8vl4b1kqc44Qoe
+    2c5uGEHh+Iv6v/V5JwzTrfbcaWeAv058NnN9rF8i
+    -----END CERTIFICATE-----
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca.crt
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDjzCCAnegAwIBAgIUQ1AagVQXCuOIzmGXm+KhsbyBc18wDQYJKoZIhvcNAQEN
+    BQAwVzESMBAGA1UEAwwJbG9jYWxob3N0MREwDwYDVQQKDAhNYWluZmx1eDEMMAoG
+    A1UECwwDSW9UMSAwHgYJKoZIhvcNAQkBFhFpbmZvQG1haW5mbHV4LmNvbTAeFw0x
+    OTA0MDEwOTI3MDFaFw0yMjAzMzEwOTI3MDFaMFcxEjAQBgNVBAMMCWxvY2FsaG9z
+    dDERMA8GA1UECgwITWFpbmZsdXgxDDAKBgNVBAsMA0lvVDEgMB4GCSqGSIb3DQEJ
+    ARYRaW5mb0BtYWluZmx1eC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+    AoIBAQCq6O4PHwgGOmEafjea5KocG80GYSYbvN37ums6fQ1wcmCxn8LtZek8WkfJ
+    S2NQQPDvn8QWRY7aUkTAW7cEB4vxpT25bevP7KJNFAS8XZO7NTfF8fscJS+YWSXz
+    VS0OFZ2YuqTnjCiqWf5mvjAkkXBGIYq+k2ONM1tHlEA0lzbLun2a9H/XarCG+znj
+    pfYpW6R08zFzXyGb4sI2pyYpP7iZLla7PTSZTt9h6jkY3qqMDhEHhPdlXDhO1O9/
+    lA8yWMO9vKCzC7ngDXnV99Nl+tFhp9z9VkTUveLMuN9+riDJRfP25fOzHuRYzmsR
+    emYjD1NvSgsvFqSbFDVXB8kcyrXPAgMBAAGjUzBRMB0GA1UdDgQWBBRs4xR91qEj
+    NRGmw391xS7x6Tc+8jAfBgNVHSMEGDAWgBRs4xR91qEjNRGmw391xS7x6Tc+8jAP
+    BgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBDQUAA4IBAQAAPMf7bVFhzUG8AYq0
+    VS9BWVwVtdNzZ3X9FkG9O+tZZO43GlaToym8PmhJHF9wk3AA+pmgfcmBrHcTG0me
+    PeincN2euO0c4iv1f/i4bAY5/iq/Q0w/GiuTL5VLVpaH1SQrWhc0ZD7Ii+lVPpFQ
+    bJXKHFQBnZU7mWeQnL9W1SVhWfsSKShBkAEUeGXo3YMC7nYsFJkl/heC3sYqfrW4
+    7fq80u+TU6HjGetSAWKacae7eeNmprMn0lFw2VqPQG3M4M0l9pEfcrRygOAnqNKO
+    aNi2UYKBla3XeDjObovOsXRScTKmJZwJ/STJlu+x5UAwF34ZBJy0O2qdd+kOxAhj
+    5Yq2
+    -----END CERTIFICATE-----
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mainflux-server.key
+data:
+  mainflux-server.key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQD1LayMnOYlTHWk
+    K/7BIc2nRLkfkbfyejIujEKIuOPYZ1DbG36VeSM1MYlpzl+E7gJvvK1RuCcL4DKG
+    0uExI6HV2GdEq9kSe3Pj/512VTq+bXvMDRTcHMUkaN0NJ7GybHNk8J3fmFlB61zU
+    pZUNy0M14YYX8tZRMMw8Ke6ThJyj8ulSky4Cp2tfiGK9+YLP/UJkSm+0EOVAOMAt
+    LNvXtg5+/0e63M+stdf+F3txLuiYXiOG399tXlI61r4L5fKs0xau6P1V5uEPwAnQ
+    iXYVLCdahfGrUJIjHnHTU0TS2EpE8OxAu0krzQeONGSUg6SMM8vCP0d8yqQrYZGk
+    maFmIiTgOmy/fs+8u/ykautiOR/SviTR3hi/ofjZ+NTdT2Udg98BGuZBwKw+elaj
+    HUSUEkxtJVxeuFiVGzZNXkEhuxU6VNCnPeXxtl502rU9nmhmO2WJ0/1KX+oe/uTC
+    99b+olEPm72exsX0mwkSpIwDRBpX9meER4vJe4yX9fmotqEC2G30C9KYn+STcY9P
+    7jptJgLLuN61DVBjeMPLW+0NTjqmtplcu73zYvyCsG4rhIhY291wvz18iNLY7Bfe
+    hU3beEx68ApdLMue6xi9JlFKxHf5FHBnBSvD2xrR47rH9UMOHLglB+QkoidQ3Kug
+    HJ8r1sVHPhuS8mE7cENReFoNfh+N2wIDAQABAoICAQDwIbfqUJGo3mYqUVzGVBFU
+    Tp7yKIp9VulnZcCUoGGoRiiPMTKdu3OcWdQ4aQRs8aA5SBaI/1Be9UsHeetNcZTE
+    GZurSpTk4Tz0hhr3Fyrd7+VcSUOxAgykSICYrdQA6O9sYa5+nHxvb9IQA80lIXvG
+    fggT1KfMBXtDQd6FZVD10qhrU/OwbcFgY/gyEPrqMyafi7g0KIgginTOyizX7Vvt
+    TqI2hqZwhfnyx5UDmen9sdYh94qhV8w6DLE+fg1c77I7xb66L9Mm1fPG55tbyU8R
+    /jZgkB1RgDQDwn6Z83VqaH08OTLFT56izPXl77luCBz9N3UQ6Hg6dOlsyXumyLJL
+    cKjZ3Yoaqu9GHEauiaIJqPX4bN6O0TjG/vW0yKdGSFgh7jfjIiYCmMnb526PolKM
+    YN4xZ/KcdGa4QGKuX0hfgYLaOAM4U+V2Flb6QiSSta+UAFPOC7d7fEZIwYrgieB9
+    10jnFqXqAef5w16Z1KZNI+X1FO5keHkOBqliXCdQJoLBwAt7nJFkgETatK5XCra1
+    WR/iVcanZrvwD7pITZXbROcOF9MxKxkAqxU8Xeftr47r5XteuqSd3uRmsa7034QV
+    0TNV2OUBv4UCa5DpEftSjoX5GQKKXkAFix3QdW+RqiZ4tGVnrCUShhgg9H3aOu2y
+    dePbf3F5R7P9g4SbfKFGAQKCAQEA/GVCzoihnM9j+DmP63xoNyWNGVQ3foeZw/o6
+    FvGYx5yUeYm+uwuq80hpd4KtHZoqbO3ohEsyZBHBwGjbmjxzwmrKbZukJ8Zxs7QQ
+    cB0YBmHduay59+MnmL3uiiLGsFedSlbReCJnFw+66yXfvDPVf4vs1I+DPtEIBkY5
+    mOOdfP7b4vQtQbhtw4EAPSORbcR9ap4DCRmedp9aWTh48VNvqGLJIxRxveHcX/F2
+    zAySGkw2s/pwQXq0htCComDn3X3yqw4y9WKirzmS5hYU4gsuk+dy3JSHhe0bsA8Y
+    daf4kEdutqyjYj1IaaDuvkiRW/6Pukb//R94/tejmwBLA5LXGwKCAQEA+K4HGruw
+    zlGKfQNc2uKX5uzB6N+rWQ//5oFhe/Lga2pQZlwDCay+3G9YWiVLP+wxEAkuoQcx
+    thfYFWLMy/8+Vyuiej/N73hWYXPgja7BA0d/j9/IKhtjvN2qIzA2xxKCkzqunXms
+    VnOoHVwhoqtVEZ9trB2gdO3ywE52aqSq131rVABOJDoFq9lVw4bl9Rj9wkp6D+tr
+    Dx1pMeKrBFKfxuCgAyj//BJrNSryxAxglAzyC75RKAPT6fvcw3Wcpnb10IXDt3Rd
+    g5YHMxas3g1fh2ieRVsQG4OvGytP9Uap6//AqM6c273Q86U3/pu3r8nvEMBKxdsx
+    pc4/raRsoUPQQQKCAQBNCBLFukmo9FsMjXTxaDzeZ+WSj3OIeJZji+Fi00XP1mgy
+    V+oQaFU6fyVBRm7TlBPSvyGyDslIZWr+8IHlpwGlmrZBkbkeMqDNOe2yag7FE+V6
+    H896aqfRJFbDbi258GOfJrQzuDxCe5iO4DZS2HcWwHv9u/dQmreaQqCdmwqb9aTi
+    taeCYWmOu7Z48nwWRlwIyEUg5+LHTYdjp6qx7MctW0kMHddBHsgFuEqLqGKHCC/B
+    6nOMaIjkhIr6SB08Ko5/youe/QWt+SJuetrQypzio0cZL3PVWjKTH2hVsHhagJK3
+    yiTrfMy3AFkdVkSXETCIp9bFSG/DR8k1K3e5lX11AoIBAAfSCT0o++VxIQbPbUMg
+    7x//ABYfupbBbw3DsdohCDe4jzC44guS2Cm8gq3LEHPBLMXRVBsSS9jrJQt/IOul
+    akN5htGLYiGOykCkUUKDZWSCAhv3MKdKVzegTPJwWLin911D8ivXoLjTSE0sEY65
+    DqLQPbW09M/Yj9LGZOjzpr/CHPb2T37KKFWALzdH7cFoeMp8ZxxLDgHare04sKIh
+    Kw8pDz8qMequdZqlcB8EOKFPSuldodW9URPBrO6kqzl88jwNiNsjGLHDrRRJOUR+
+    bSun+Zo6w+XpnT8gfJI9F6jpURi97qbmcETJRFqIcR1hH1iKg493VjddphkC27uy
+    k0ECggEAR1LyWFqTUxpP15EGA4vE64c0T6gmWmSyQiZ2VbMYWlgBCZJQN1EFDoFB
+    rLQvhy8jEU3zxbJPEOQmQL8OGzMBMgV/akEsTTEAPLbQc0ROSR7CW3YV8UlyBUP5
+    4/WK1NUR8GXyeCjJSWHgn/LclkcFmyJ5DCKmesMRAodMhkHkqmSTZxPAYmlipn87
+    PcGOoG02NlgjDADjwhRepRI7wVbb8HVXfGxhiPokAri/OgC/odnHIGzkdznur6JS
+    5eUoZkBcH16zBGxfwoGhqSGdip1BNNs2nUp4T0i+LGVKz8mYsZ9CdiGElfUwLpcc
+    eFet28DEMzSifudXY3LYE5N0Vl6g+A==
+    -----END PRIVATE KEY-----
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-nginx
+    spec:
+      containers:
+      - name: nginx
+        image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+        imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+        args:
+          - /entrypoint.sh
+        env:
+          - name: DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL
+            value: debug
+          - name: DOCKER_VERNEMQ_PLUGINS__MFX_AUTH
+            value: "on"
+          - name: DOCKER_VERNEMQ_PLUGINS__MFX_AUTH__PATH
+            value: /mainflux/_build/default
+          - name: DOCKER_VERNEMQ_PLUGINS__VMQ_ACL
+            value: "off"
+          - name: DOCKER_VERNEMQ_PLUGINS__VMQ_PASSWD
+            value: "off"
+          - name: MF_HTTP_ADAPTER_PORT
+            value: "8185"
+          - name: MF_MQTT_ADAPTER_PORT
+            value: "1883"
+          - name: MF_MQTT_ADAPTER_WS_PORT
+            value: "8080"
+          - name: MF_MQTT_CLUSTER
+            value: "1"
+          - name: MF_NGINX_HTTP_PORT
+            value: "80"
+          - name: MF_NGINX_MQTTS_PORT
+            value: "8883"
+          - name: MF_NGINX_MQTT_PORT
+            value: "1883"
+          - name: MF_NGINX_SSL_PORT
+            value: "443"
+          - name: MF_THINGS_HTTP_PORT
+            value: "8182"
+          - name: MF_USERS_HTTP_PORT
+            value: "8180"
+          - name: MF_WS_ADAPTER_PORT
+            value: "8186"
+        volumeMounts:
+          - mountPath: /etc/ssl/certs/dhparam.pem
+            name: vol1
+            subPath: dhparam.pem
+          - mountPath: /etc/nginx/nginx.conf.template
+            name: vol2
+            subPath: nginx.conf.template
+          - mountPath: /entrypoint.sh
+            name: vol3
+            subPath: entrypoint.sh
+          - mountPath: /etc/nginx/snippets
+            name: vol4
+          - mountPath: /etc/nginx/authorization.js
+            name: vol5
+            subPath: authorization.js
+          - mountPath: /etc/ssl/certs/mainflux-server.crt
+            name: vol6
+            subPath: mainflux-server.crt
+          - mountPath: /etc/ssl/certs/ca.crt
+            name: vol7
+            subPath: ca.crt
+          - mountPath: /etc/ssl/private/mainflux-server.key
+            name: vol8
+            subPath: mainflux-server.key
+      volumes:
+      - configMap:
+          defaultMode: 0644
+          name: dhparam.pem
+          optional: false
+        name: vol1
+      - configMap:
+          defaultMode: 0644
+          name: nginx.conf.template
+          optional: false
+        name: vol2
+      - configMap:
+          defaultMode: 0755
+          name: entrypoint.sh
+          optional: false
+        name: vol3
+      - configMap:
+          defaultMode: 0644
+          name: snippets
+          optional: false
+        name: vol4
+      - configMap:
+          defaultMode: 0644
+          name: authorization.js
+          optional: false
+        name: vol5
+      - configMap:
+          defaultMode: 0644
+          name: mainflux-server.crt
+          optional: false
+        name: vol6
+      - configMap:
+          defaultMode: 0644
+          name: ca.crt
+          optional: false
+        name: vol7
+      - configMap:
+          defaultMode: 0644
+          name: mainflux-server.key
+          optional: false
+        name: vol8

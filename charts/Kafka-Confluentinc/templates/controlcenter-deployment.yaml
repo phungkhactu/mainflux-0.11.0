@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.controlcenter.name }}
+  labels:
+    app: {{ .Values.controlcenter.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.controlcenter.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.controlcenter.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.controlcenter.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.controlcenter.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.controlcenter.name }}
+    spec:
+      containers:
+      - name: {{ .Values.controlcenter.name }}
+        image: "{{ .Values.controlcenter.image.repository }}:{{ .Values.controlcenter.image.tag }}"
+        imagePullPolicy: {{ .Values.controlcenter.image.pullPolicy }}
+        env:
+          - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERBOOTSTRAPSERVERS }}
+          - name: CONTROL_CENTER_ZOOKEEPER_CONNECT
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERZOOKEEPERCONNECT }}
+          - name: CONTROL_CENTER_CONNECT_CLUSTER
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERCONNECTCLUSTER }}
+          - name: CONTROL_CENTER_KSQL_KSQLDB1_URL
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERKSQLKSQLDB1URL }}
+          - name: CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERKSQLKSQLDB1ADVERTISEDURL }}
+          - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERSCHEMAREGISTRYURL }}
+          - name: CONTROL_CENTER_REPLICATION_FACTOR
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERREPLICATIONFACTOR | quote }}
+          - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERINTERNALTOPICSPARTITIONS | quote }}
+          - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS
+            value: {{ .Values.environment.controlcenter.CONTROLCENTERMONITORINGINTERCEPTORTOPICPARTITIONS | quote }}
+          - name: CONFLUENT_METRICS_TOPIC_REPLICATION
+            value: {{ .Values.environment.controlcenter.CONFLUENTMETRICSTOPICREPLICATION | quote }}
+          - name: PORT
+            value: {{ .Values.environment.controlcenter.PORT | quote }}            

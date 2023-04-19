@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.orimxsystempermissionv2.name }}
+data:
+  {{ .Values.configmap.orimxsystempermissionv2.key }}: |
+    {{ .Values.configmap.orimxsystempermissionv2.value }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.orimxsystempermissionv2.name }}
+  labels:
+    app: {{ .Values.orimxsystempermissionv2.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxsystempermissionv2.name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxUnavailable }}
+    type: {{ .Values.upgradepolicy.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Values.orimxsystempermissionv2.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxsystempermissionv2.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.orimxsystempermissionv2.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxsystempermissionv2.name }}
+    spec:
+      containers:
+      - name: {{ .Values.orimxsystempermissionv2.name }}
+        image: "{{ .Values.orimxsystempermissionv2.image.repository }}:{{ .Values.orimxsystempermissionv2.image.tag }}"
+        imagePullPolicy: {{ .Values.orimxsystempermissionv2.image.pullPolicy }}
+        env:
+        - name: TZ
+          value: {{ .Values.environment.general.TZ }}
+        volumeMounts:
+        - mountPath: {{ .Values.volume.general.volumeMounts.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts.readOnly }}
+        - mountPath: {{ .Values.volume.orimxsystempermissionv2.volumeMounts.mountPath }}
+          name: {{ .Values.volume.orimxsystempermissionv2.volumeMounts.name }}
+          subPath: {{ .Values.volume.orimxsystempermissionv2.volumeMounts.subPath }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.spec.container.securityContext.allowPrivilegeEscalation }}
+          capabilities: {{ .Values.spec.container.securityContext.capabilities }}
+          privileged: {{ .Values.spec.container.securityContext.privileged }}
+          readOnlyRootFilesystem: {{ .Values.spec.container.securityContext.readOnlyRootFilesystem }}
+          runAsNonRoot: {{ .Values.spec.container.securityContext.runAsNonRoot }}
+      hostIPC: {{ .Values.spec.hostIPC }}
+      hostPID: {{ .Values.spec.hostPID }}
+      volumes:
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes.hostPath.path }}
+          type: {{ .Values.volume.general.volumes.hostPath.type }}
+        name: {{ .Values.volume.general.volumes.name }}
+      - configMap:
+          defaultMode: {{ .Values.volume.orimxsystempermissionv2.volumes.configMap.defaultMode }}
+          name: {{ .Values.volume.orimxsystempermissionv2.volumes.configMap.name }}
+          optional: {{ .Values.volume.orimxsystempermissionv2.volumes.configMap.optional }}
+        name: {{ .Values.volume.orimxsystempermissionv2.volumes.name }}

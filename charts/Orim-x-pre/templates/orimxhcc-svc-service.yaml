@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxhcc.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxhcc.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxhcc.externalIPs.ip1 }}
+  - {{ .Values.service.orimxhcc.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxhcc.namehttp }}
+    port: {{ .Values.service.orimxhcc.http.port }}
+    protocol: {{ .Values.service.orimxhcc.http.protocol }}
+    targetPort: {{ .Values.service.orimxhcc.http.targetPort }}
+  type: ClusterIP

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.ksqldatagen.name }}
+  labels:
+    app: {{ .Values.ksqldatagen.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldatagen.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.ksqldatagen.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldatagen.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ksqldatagen.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.ksqldatagen.name }}
+    spec:
+      containers:
+      - args:
+          - bash
+          - -c
+          - {{ .Values.ksqldatagen.args }}
+        name: {{ .Values.ksqldatagen.name }}
+        image: "{{ .Values.ksqldatagen.image.repository }}:{{ .Values.ksqldatagen.image.tag }}"
+        imagePullPolicy: {{ .Values.ksqldatagen.image.pullPolicy }}
+        env:
+          - name: KSQL_CONFIG_DIR
+            value: {{ .Values.environment.ksqldatagen.KSQLCONFIGDIR }}
+          - name: STREAMS_BOOTSTRAP_SERVERS
+            value: {{ .Values.environment.ksqldatagen.STREAMSBOOTSTRAPSERVERS }}
+          - name: STREAMS_SCHEMA_REGISTRY_HOST
+            value: {{ .Values.environment.ksqldatagen.STREAMSSCHEMAREGISTRYHOST }}
+          - name: STREAMS_SCHEMA_REGISTRY_PORT
+            value: {{ .Values.environment.ksqldatagen.STREAMSSCHEMAREGISTRYPORT | quote }}

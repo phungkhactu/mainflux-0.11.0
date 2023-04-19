@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.broker.name }}
+  labels:
+    app: {{ .Values.broker.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.broker.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.broker.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.broker.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.broker.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.broker.name }}
+    spec:
+      containers:
+      - name: {{ .Values.broker.name }}
+        image: "{{ .Values.broker.image.repository }}:{{ .Values.broker.image.tag }}"
+        imagePullPolicy: {{ .Values.broker.image.pullPolicy }}
+        env:
+          - name: KAFKA_BROKER_ID
+            value: {{ .Values.environment.broker.KAFKABROKERID | quote }}
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: {{ .Values.environment.broker.KAFKAZOOKEEPERCONNECT }}
+          - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+            value: {{ .Values.environment.broker.KAFKALISTENERSECURITYPROTOCOLMAP }}
+          - name: KAFKA_ADVERTISED_LISTENERS
+            value: {{ .Values.environment.broker.KAFKAADVERTISEDLISTENERS }}
+          - name: KAFKA_METRIC_REPORTERS
+            value: {{ .Values.environment.broker.KAFKAMETRICREPORTERS }}
+          - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+            value: {{ .Values.environment.broker.KAFKAOFFSETSTOPICREPLICATIONFACTOR | quote }}
+          - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+            value: {{ .Values.environment.broker.KAFKAGROUPINITIALREBALANCEDELAYMS | quote }}
+          - name: KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR
+            value: {{ .Values.environment.broker.KAFKACONFLUENTLICENSETOPICREPLICATIONFACTOR | quote }}
+          - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+            value: {{ .Values.environment.broker.KAFKATRANSACTIONSTATELOGMINISR | quote }}
+          - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+            value: {{ .Values.environment.broker.KAFKATRANSACTIONSTATELOGREPLICATIONFACTOR | quote }}
+          - name: CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS
+            value: {{ .Values.environment.broker.CONFLUENTMETRICSREPORTERBOOTSTRAPSERVERS }}
+          - name: CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT
+            value: {{ .Values.environment.broker.CONFLUENTMETRICSREPORTERZOOKEEPERCONNECT }}    
+          - name: CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS
+            value: {{ .Values.environment.broker.CONFLUENTMETRICSREPORTERTOPICREPLICAS | quote }}
+          - name: CONFLUENT_METRICS_ENABLE
+            value: {{ .Values.environment.broker.CONFLUENTMETRICSENABLE | quote }}
+          - name: CONFLUENT_SUPPORT_CUSTOMER_ID
+            value: {{ .Values.environment.broker.CONFLUENTSUPPORTCUSTOMERID }}
+          - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+            value: {{ .Values.environment.broker.KAFKAAUTOCREATETOPICSENABLE | quote }}

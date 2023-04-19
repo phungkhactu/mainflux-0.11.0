@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxplatformpermissionv2.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxplatformpermissionv2.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxplatformpermissionv2.externalIPs.ip1 }}
+  - {{ .Values.service.orimxplatformpermissionv2.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxplatformpermissionv2.namehttp }}
+    port: {{ .Values.service.orimxplatformpermissionv2.http.port }}
+    protocol: {{ .Values.service.orimxplatformpermissionv2.http.protocol }}
+    targetPort: {{ .Values.service.orimxplatformpermissionv2.http.targetPort }}
+  type: ClusterIP

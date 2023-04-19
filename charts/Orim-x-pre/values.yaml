@@ -1,0 +1,834 @@
+environment:
+  module:
+    livechatserver:
+    orimxcallcenterccapi:
+    orimxcallcenterccconnector:
+    orimxhcc:
+    orimxhttpcontentv2:
+    orimxlivechat:
+    orimxmasterdata:
+    orimxreport:
+    orimxreportchannel:
+    orimxreportdetail:
+    orimxsearch:
+    orimxsupport:
+  core:
+    mobileappstore:
+    nginxappstore:
+    orimxclientcrm:
+    orimxclientpermission:
+    orimxclientportal:
+    orimxplatformpermissionv2:
+    orimxplatformv2:
+    orimxsystempermissionv2:
+    redisjson2:
+  general:
+    TZ: "Asia/Ho_Chi_Minh"
+configmap:
+  livechat:
+    name: &name_livechat "live-chat-config"
+    key: &key_livechat "app.test"
+    value: "test"
+  orimxcallcenterccapi:
+    name: &name_orimxcallcenterccapi "orimx-callcenter-cc-api-config"
+    key: &key_orimxcallcenterccapi "app.test"
+    value: "test"
+  orimxcallcenterccconnector:
+    name: &name_orimxcallcenterccconnector "orimx-callcenter-cc-connector-config"
+    key: &key_orimxcallcenterccconnector "app.test"
+    value: "test"
+  orimxhcc:
+    name: &name_orimxhcc "sohoa-ocr-config"
+    key: &key_orimxhcc "app.test"
+    value: "test"
+  orimxhttpcontentv2:
+    name: &name_orimxhttpcontentv2 "orimx-httpcontent-v2-config"
+    key: &key_orimxhttpcontentv2 "app.test"
+    value: "test"
+  orimxlivechat:
+    name: &name_orimxlivechat "orimx-livechat-config"
+    key: &key_orimxlivechat "app.test"
+    value: "test"
+  orimxmasterdata:
+    name: &name_orimxmasterdata "orimx-masterdata-config"
+    key: &key_orimxmasterdata "app.test"
+    value: "test"
+  orimxreport:
+    name: &name_orimxreport "orimx-report-config"
+    key: &key_orimxreport "app.test"
+    value: "test"
+  orimxreportchannel:
+    name: &name_orimxreportchannel "orimx-report-channel-config"
+    key: &key_orimxreportchannel "app.test"
+    value: "test"
+  orimxreportdetail:
+    name: &name_orimxreportdetail "orimx-report-detail-config"
+    key: &key_orimxreportdetail "app.test"
+    value: "test"
+  orimxsearch:
+    name: &name_orimsearch "orimx-search-config"
+    key: &key_orimxsearch "app.test"
+    value: "test"
+  orimxsupport:
+    name: &name_orimxsupport "orimx-support-config"
+    key: &key_orimxsupport "app.test"
+    value: "test"
+  mobileappstore:
+    name: &name_mobileappstore "mobile-appstore-config"
+    key: &key_mobileappstore "app.test"
+    value: "test"
+  nginxappstore:
+    name: &name_nginxappstore "nginx-appstore-config"
+    key: &key_nginxappstore "app.test"
+    value: "test"
+  orimxclientcrm:
+    name: &name_orimxclientcrm "orimx-client-crm-config"
+    key: &key_orimxclientcrm "app.test"
+    value: "test"
+  orimxclientpermission:
+    name: &name_orimxclientpermission "orimx-client-permission-config"
+    key: &key_orimxclientpermission "app.test"
+    value: "test"
+  orimxclientportal:
+    name: &name_orimxclientportal "orimx-client-portal-config"
+    key: &key_orimxclientportal "app.test"
+    value: "test"
+  orimxplatformpermissionv2:
+    name: &name_orimxplatformpermissionv2 "orimx-platform-permission-v2-config"
+    key: &key_orimxplatformpermissionv2 "app.test"
+    value: "test"
+  orimxplatformv2:
+    name: &name_orimxplatformv2 "orimx-platform-v2-config"
+    key: &key_orimxplatformv2 "app.test"
+    value: "test"
+  orimxsystempermissionv2:
+    name: &name_orimxsystempermissionv2 "orimx-system-permission-v2-config"
+    key: &key_orimxsystempermissionv2 "app.test"
+    value: "test"
+  redisjson2:
+    name: &name_redisjson2 "redisjson2-config"
+    key: &key_redisjson2 "app.test"
+    value: "test"
+volume:
+  general:
+    volumeMounts:
+      mountPath: "/etc/hosts"
+      name: "vol1"
+      readOnly: "true"
+    volumes:
+      hostPath:
+        path: "/etc/hosts"
+        type: ""
+      name: "vol1"
+  orimxhttpcontentv2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxhttpcontentv2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxhttpcontentv2
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/localtime"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/etc/localtime"
+        type: ""
+      name: "vol3"
+  orimxreport:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxreport
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxreport
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/localtime"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/etc/localtime"
+        type: ""
+      name: "vol3"
+    volumeMounts2:
+      mountPath: "/etc/timezone"
+      name: "vol4"
+      readOnly: "true"
+    volumes2:
+      hostPath:
+        path: "/etc/timezone"
+        type: ""
+      name: "vol4"
+  orimxreportchannel:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxreportchannel
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxreportchannel
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/localtime"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/etc/localtime"
+        type: ""
+      name: "vol3"
+    volumeMounts2:
+      mountPath: "/etc/timezone"
+      name: "vol4"
+      readOnly: "true"
+    volumes2:
+      hostPath:
+        path: "/etc/timezone"
+        type: ""
+      name: "vol4"
+  orimxreportdetail:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxreportdetail
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxreportdetail
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/localtime"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/etc/localtime"
+        type: ""
+      name: "vol3"
+    volumeMounts2:
+      mountPath: "/etc/timezone"
+      name: "vol4"
+      readOnly: "true"
+    volumes2:
+      hostPath:
+        path: "/etc/timezone"
+        type: ""
+      name: "vol4"
+  livechatserver:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_livechatserver
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_livechatserver
+        optional: "false"
+      name: "vol2"
+  orimxcallcenterccapi:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxcallcenterccapi
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxcallcenterccapi
+        optional: "false"
+      name: "vol2"
+  orimxcallcenterccconnector:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxcallcenterccconnector
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxcallcenterccconnector
+        optional: "false"
+      name: "vol2"
+  orimxfacebookv2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxfacebookv2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxfacebookv2
+        optional: "false"
+      name: "vol2"
+  orimxhcc:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxhcc
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxhcc
+        optional: "false"
+      name: "vol2"
+  orimxlivechat:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxlivechat
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxlivechat
+        optional: "false"
+      name: "vol2"
+  orimxmasterdata:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxmasterdata
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxmasterdata
+        optional: "false"
+      name: "vol2"
+  orimxsearch:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxsearch
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxsearch
+        optional: "false"
+      name: "vol2"
+  orimxsupport:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxsupport
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxsupport
+        optional: "false"
+      name: "vol2"
+  mobileappstore:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_mobileappstore
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_mobileappstore
+        optional: "false"
+      name: "vol2"
+  nginxappstore:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_nginxappstore
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_nginxappstore
+        optional: "false"
+      name: "vol2"
+  orimxclientcrm:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxclientcrm
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxclientcrm
+        optional: "false"
+      name: "vol2"
+  orimxclientpermission:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxclientpermission
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxclientpermission
+        optional: "false"
+      name: "vol2"
+  orimxclientportal:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxclientportal
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxclientportal
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/nginx/conf.d/portal.conf"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/data/orimx-portal/portal.conf"
+        type: ""
+      name: "vol3"
+  orimxplatformpermissionv2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxplatformpermissionv2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxplatformpermissionv2
+        optional: "false"
+      name: "vol2"
+  orimxplatformv2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxplatformv2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxplatformv2
+        optional: "false"
+      name: "vol2"
+    volumeMounts1:
+      mountPath: "/etc/localtime"
+      name: "vol3"
+      readOnly: "true"
+    volumes1:
+      hostPath:
+        path: "/etc/localtime"
+        type: ""
+      name: "vol3"
+    volumeMounts2:
+      mountPath: "/etc/timezone"
+      name: "vol4"
+      readOnly: "true"
+    volumes2:
+      hostPath:
+        path: "/etc/timezone"
+        type: ""
+      name: "vol4"
+  orimxsystempermissionv2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_orimxsystempermissionv2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_orimxsystempermissionv2
+        optional: "false"
+      name: "vol2"
+  redisjson2:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_redisjson2
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_redisjson2
+        optional: "false"
+      name: "vol2"
+upgradepolicy:
+  strategy:
+    rollingUpdate:
+      maxSurge: "1"
+      maxUnavailable:  "0"
+    type: "RollingUpdate"
+spec:
+  container:
+    securityContext:
+      allowPrivilegeEscalation: "false"
+      capabilities: "{}"
+      privileged: "false"
+      readOnlyRootFilesystem: "false"
+      runAsNonRoot: "false"
+  hostIPC: "false"
+  hostPID: "false"
+redisserver:
+  image:
+    repository: "redis"
+    tag: "5.0.7-alpine3.11"
+    pullPolicy: "Always"
+  name: "redis-server"
+livechatserver:
+  image:
+    repository: "centrifugo/centrifugo"
+    tag: ""
+    pullPolicy: "Always"
+  name: "livechat-server"
+orimxcallcenterccapi:
+  image:
+    repository: "tupk/orimx-callcenter-cc-api"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-callcenter-cc-api"
+orimxcallcenterccconnector:
+  image:
+    repository: "tupk/orimx-callcenter-cc-connector"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-callcenter-cc-connector"
+orimxhcc:
+  image:
+    repository: "tupk/orimx-hcc"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-hcc"
+orimxhttpcontentv2:
+  image:
+    repository: "tupk/orimx-httpcontent-v2"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-httpcontent-v2"
+orimxlivechat:
+  image:
+    repository: "tupk/orimx-livechat"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-livechat"
+orimxmasterdata:
+  image:
+    repository: "tupk/orimx-masterdata"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-masterdata"
+orimxreport:
+  image:
+    repository: "tupk/orimx-report"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-report"
+orimxreportchannel:
+  image:
+    repository: "tupk/orimx-report-channel"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-report-channel"
+orimxreportdetail:
+  image:
+    repository: "tupk/orimx-report-detail"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-report-detail"
+orimxsearch:
+  image:
+    repository: "tupk/orimx-search"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-search"
+orimxsupport:
+  image:
+    repository: "tupk/orimx-support"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-support"
+mobileappstore:
+  image:
+    repository: "tupk/mobile-appstore"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "mobile-appstore"
+nginxappstore:
+  image:
+    repository: "tupk/nginx-appstore"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "nginx-appstore"
+orimxclientcrm:
+  image:
+    repository: "tupk/orimx-client-crm"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-client-crm"
+orimxclientpermission:
+  image:
+    repository: "tupk/orimx-client-permission"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-client-permission"
+orimxclientportal:
+  image:
+    repository: "tupk/orimx-client-portal"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-client-portal"
+orimxplatformpermissionv2:
+  image:
+    repository: "tupk/orimx-platform-permission"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-platform-permission-v2"
+orimxplatformv2:
+  image:
+    repository: "tupk/orimx-platform"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-platform-v2"
+orimxsystempermissionv2:
+  image:
+    repository: "tupk/orimx-system-permission"
+    tag: "staging"
+    pullPolicy: "Always"
+  name: "orimx-system-permission-v2"
+redisjson2:
+  image:
+    repository: "redislabs/redisjson2"
+    tag: "edge"
+    pullPolicy: "Always"
+  name: "redisjson2"
+service:
+  orimxclientcrm:
+    name: "client-crm-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "client-crm"
+    http:
+      port: "20082"
+      protocol: "TCP"
+      targetPort: "10082"
+    type: "ClusterIP"
+  orimxclientpermission:
+    name: "client-perm-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "client-perm"
+    http:
+      port: "25002"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"
+  orimxclientportal:
+    name: "client-portal-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "client-portal"
+    http:
+      port: "20080"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"
+  nginxappstore:
+    name: "nginx-appstore-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "port"
+    http:
+      port: "21080"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"
+  orimxplatformpermissionv2:
+    name: "orimx-platform-permission-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "orimx-platform-permission"
+    http:
+      port: "25003"
+      protocol: "TCP"
+      targetPort: "5003"
+    type: "ClusterIP"
+  orimxplatformv2:
+    name: "orimx-platform-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "orimx-platform"
+    http:
+      port: "20081"
+      protocol: "TCP"
+      targetPort: "81"
+    type: "ClusterIP"
+  orimxsystempermissionv2:
+    name: "orimx-system-permission-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "orimx-system-permission"
+    http:
+      port: "25004"
+      protocol: "TCP"
+      targetPort: "5004"
+    type: "ClusterIP"
+  redisjson2:
+    name: "redisjson2-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "port"
+    http:
+      port: "22222"
+      protocol: "TCP"
+      targetPort: "6379"
+    type: "ClusterIP"
+  mobileappstore:
+    name: "store-svc"
+    externalIPs:
+      ip1: "10.159.135.71"
+      ip2: "10.159.135.72"
+    namehttp: "port"
+    http:
+      port: "21323"
+      protocol: "TCP"
+      targetPort: "1323"
+    type: "ClusterIP"
+  orimxcallcenterccapi:
+    name: "cc-api-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "cc-api"
+    http:
+      port: "20088"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"
+ orimxcallcenterccconnector:
+    name: "cc-connector-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "cc-connector	"
+    http:
+      port: "21083"
+      protocol: "TCP"
+      targetPort: "1083"
+    type: "ClusterIP"
+  orimxhcc:
+    name: "hcc-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "hcc"
+    http:
+      port: "28086"
+      protocol: "TCP"
+      targetPort: "8080"
+    type: "ClusterIP"
+  orimxhttpcontentv2:
+    name: "httpcontent-v2-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "httpcontent-v2"
+    http:
+      port: "29090"
+      protocol: "TCP"
+      targetPort: "9090"
+    type: "ClusterIP"
+  livechatserver:
+    name: "livechat-server-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "8000"
+    http:
+      port: "28000"
+      protocol: "TCP"
+      targetPort: "8000"
+    type: "ClusterIP"
+  orimxmasterdata:
+    name: "masterdata-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "masterdata"
+    http:
+      port: "28082"
+      protocol: "TCP"
+      targetPort: "8082"
+    type: "ClusterIP"
+  orimxlivechat:
+    name: "orimx-livechat-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "21323"
+    http:
+      port: "21323"
+      protocol: "TCP"
+      targetPort: "1323"
+    type: "ClusterIP"
+  orimxsearch:
+    name: "orimx-search-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "search"
+    http:
+      port: "28084"
+      protocol: "TCP"
+      targetPort: "8084"
+    type: "ClusterIP"
+  orimxsupport:
+    name: "orimx-support-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "21324"
+    http:
+      port: "21324"
+      protocol: "TCP"
+      targetPort: "1323"
+    type: "ClusterIP"
+  orimxreport:
+    name: "report-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "report"
+    http:
+      port: "28083"
+      protocol: "TCP"
+      targetPort: "8083"
+    type: "ClusterIP"
+  orimxreportchannel:
+    name: "report-channel-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "report-channel"
+    http:
+      port: "20084"
+      protocol: "TCP"
+      targetPort: "84"
+    type: "ClusterIP"
+  orimxreportdetail:
+    name: "report-detail-svc"
+    externalIPs:
+      ip1: "10.159.135.69"
+      ip2: "10.159.135.70"
+    namehttp: "report-detail"
+    http:
+      port: "28085"
+      protocol: "TCP"
+      targetPort: "8080"
+    type: "ClusterIP"

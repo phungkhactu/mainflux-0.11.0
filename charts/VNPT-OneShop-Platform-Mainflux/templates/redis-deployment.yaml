@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-server
+  labels:
+    app: redis-server
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-redis-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-server
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-redis-server
+  template:
+    metadata:
+      labels:
+        app: redis-server
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-redis-server
+    spec:
+      containers:
+      - name: redis-server
+        image: "{{ .Values.redisserver.image.repository }}:{{ .Values.redisserver.image.tag }}"
+        imagePullPolicy: {{ .Values.redisserver.image.pullPolicy }}

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.orimxreport.name }}
+data:
+  {{ .Values.configmap.orimxreport.key }}: |
+    {{ .Values.configmap.orimxreport.value }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.orimxreport.name }}
+  labels:
+    app: {{ .Values.orimxreport.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxreport.name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.upgradepolicy.strategy.rollingUpdate.maxUnavailable }}
+    type: {{ .Values.upgradepolicy.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Values.orimxreport.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxreport.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.orimxreport.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.orimxreport.name }}
+    spec:
+      containers:
+      - name: {{ .Values.orimxreport.name }}
+        image: "{{ .Values.orimxreport.image.repository }}:{{ .Values.orimxreport.image.tag }}"
+        imagePullPolicy: {{ .Values.orimxreport.image.pullPolicy }}
+        env:
+        - name: TZ
+          value: {{ .Values.environment.general.TZ }}
+        volumeMounts:
+        - mountPath: {{ .Values.volume.general.volumeMounts.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts.readOnly }}
+        - mountPath: {{ .Values.volume.orimxreport.volumeMounts.mountPath }}
+          name: {{ .Values.volume.orimxreport.volumeMounts.name }}
+          subPath: {{ .Values.volume.orimxreport.volumeMounts.subPath }}
+        - mountPath: {{ .Values.volume.general.volumeMounts1.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts1.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts1.readOnly }}
+        - mountPath: {{ .Values.volume.general.volumeMounts2.mountPath }}
+          name: {{ .Values.volume.general.volumeMounts2.name }}
+          readOnly: {{ .Values.volume.general.volumeMounts2.readOnly }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.spec.container.securityContext.allowPrivilegeEscalation }}
+          capabilities: {{ .Values.spec.container.securityContext.capabilities }}
+          privileged: {{ .Values.spec.container.securityContext.privileged }}
+          readOnlyRootFilesystem: {{ .Values.spec.container.securityContext.readOnlyRootFilesystem }}
+          runAsNonRoot: {{ .Values.spec.container.securityContext.runAsNonRoot }}
+      hostIPC: {{ .Values.spec.hostIPC }}
+      hostPID: {{ .Values.spec.hostPID }}
+      volumes:
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes.hostPath.path }}
+          type: {{ .Values.volume.general.volumes.hostPath.type }}
+        name: {{ .Values.volume.general.volumes.name }}
+      - configMap:
+          defaultMode: {{ .Values.volume.orimxreport.volumes.configMap.defaultMode }}
+          name: {{ .Values.volume.orimxreport.volumes.configMap.name }}
+          optional: {{ .Values.volume.orimxreport.volumes.configMap.optional }}
+        name: {{ .Values.volume.orimxreport.volumes.name }}
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes1.hostPath.path }}
+          type: {{ .Values.volume.general.volumes1.hostPath.type }}
+        name: {{ .Values.volume.general.volumes1.name }}
+      - hostPath: 
+          path: {{ .Values.volume.general.volumes2.hostPath.path }}
+          type: {{ .Values.volume.general.volumes2.hostPath.type }}
+        name: {{ .Values.volume.general.volumes2.name }}

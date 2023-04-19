@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.sohoafrontendpublic.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.sohoafrontendpublic.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.sohoafrontendpublic.externalIPs }}
+  ports:
+  - name: {{ .Values.service.sohoafrontendpublic.namehttp }}
+    port: {{ .Values.service.sohoafrontendpublic.http.port }}
+    protocol: {{ .Values.service.sohoafrontendpublic.http.protocol }}
+    targetPort: {{ .Values.service.sohoafrontendpublic.http.targetPort }}
+  type: ClusterIP

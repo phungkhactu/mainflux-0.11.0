@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxclientportal.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxclientportal.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxclientportal.externalIPs.ip1 }}
+  - {{ .Values.service.orimxclientportal.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxclientportal.namehttp }}
+    port: {{ .Values.service.orimxclientportal.http.port }}
+    protocol: {{ .Values.service.orimxclientportal.http.protocol }}
+    targetPort: {{ .Values.service.orimxclientportal.http.targetPort }}
+  type: ClusterIP

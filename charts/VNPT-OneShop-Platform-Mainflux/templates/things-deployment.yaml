@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: things
+  labels:
+    app: things
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-things
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: things
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-things
+  template:
+    metadata:
+      labels:
+        app: things
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-things
+    spec:
+      containers:
+      - name: things
+        image: "{{ .Values.things.image.repository }}:{{ .Values.things.image.tag }}"
+        imagePullPolicy: {{ .Values.things.image.pullPolicy }}
+        env:
+          - name: MF_AUTH_URL
+            value: authn:8181
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_THINGS_AUTH_GRPC_PORT
+            value: "8183"
+          - name: MF_THINGS_AUTH_HTTP_PORT
+            value: "8989"
+          - name: MF_THINGS_CACHE_URL
+            value: "{{ .Values.databases.redis.ip }}:{{ .Values.databases.redis.port }}"
+          - name: MF_THINGS_DB
+            value: {{ .Values.databases.postgresql.db.things }}
+          - name: MF_THINGS_DB_HOST
+            value: {{ .Values.databases.postgresql.ip }}
+          - name: MF_THINGS_DB_PASS
+            value: {{ .Values.databases.postgresql.password }}
+          - name: MF_THINGS_DB_PORT
+            value: {{ .Values.databases.postgresql.port | quote }}
+          - name: MF_THINGS_DB_USER
+            value: {{ .Values.databases.postgresql.username }}
+          - name: MF_THINGS_ES_URL
+            value: "{{ .Values.databases.redis.ip }}:{{ .Values.databases.redis.port }}"
+          - name: MF_THINGS_HTTP_PORT
+            value: "8182"
+          - name: MF_THINGS_LOG_LEVEL
+            value: {{ .Values.things.logLevel }}
+          - name: MF_THINGS_SECRET
+            value: secret

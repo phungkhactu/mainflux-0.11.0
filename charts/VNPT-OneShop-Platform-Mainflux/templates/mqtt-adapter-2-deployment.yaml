@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-adapter-2
+  labels:
+    app: mqtt-adapter-2
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-adapter-2
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter-2
+  template:
+    metadata:
+      labels:
+        app: mqtt-adapter-2
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter-2
+    spec:
+      containers:
+      - name: mqtt-adapter-2
+        image: "{{ .Values.mqttadapter.image.repository }}:{{ .Values.mqttadapter.image.tag }}"
+        imagePullPolicy: {{ .Values.mqttadapter.image.pullPolicy }}
+        env:
+          - name: DOCKER_VERNEMQ_COMPOSE
+            value: "1"
+          - name: DOCKER_VERNEMQ_DISCOVERY_NODE
+            value: mqtt-adapter-1
+          - name: DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL
+            value: {{ .Values.mqttadapter.logLevel }}
+          - name: DOCKER_VERNEMQ_PLUGINS__MFX_AUTH
+            value: "on"
+          - name: DOCKER_VERNEMQ_PLUGINS__MFX_AUTH__PATH
+            value: /mainflux/_build/default
+          - name: DOCKER_VERNEMQ_PLUGINS__VMQ_ACL
+            value: "off"
+          - name: DOCKER_VERNEMQ_PLUGINS__VMQ_PASSWD
+            value: "off"
+          - name: MF_MQTT_ADAPTER_ES_URL
+            value: "tcp://{{ .Values.databases.redis.ip }}:{{ .Values.databases.redis.port }}"
+          - name: MF_MQTT_ADAPTER_LOG_LEVEL
+            value: {{ .Values.mqttadapter.logLevel }}
+          - name: MF_MQTT_INSTANCE_ID
+            value: mqtt-adapter-1
+          - name: MF_MQTT_VERNEMQ_GRPC_POOL_SIZE
+            value: "1000"
+          - name: MF_NATS_URL
+            value: nats://nats:4222
+          - name: MF_THINGS_AUTH_GRPC_URL
+            value: http://things:8183

@@ -1,0 +1,189 @@
+environment:
+  redisserver:
+  sohoabackend:
+  sohoafrontend:
+  sohoafrontendpublic:
+  sohoaocr:
+  sohoaroleandpermission:
+  sohoasearchengine:
+  general:
+    TZ: "Asia/Ho_Chi_Minh"
+configmap:
+  sohoabackend:
+    name: &name_sohoabackend "sohoa-backend-config"
+    key: &key_sohoabackend "app.test"
+    value: "test"
+  sohoafrontend:
+    name: &name_sohoafrontend "sohoa-frontend-config"
+    key: &key_sohoafrontend "app.test"
+    value: "test"
+  sohoafrontendpublic:
+    name: &name_sohoafrontendpublic "sohoa-frontend-public-config"
+    key: &key_sohoafrontendpublic "app.test"
+    value: "test"
+  sohoaocr:
+    name: &name_sohoaocr "sohoa-ocr-config"
+    key: &key_sohoaocr "app.test"
+    value: "test"
+  sohoaroleandpermission:
+    name: &name_sohoaroleandpermission "sohoa-role-and-permission-config"
+    key: &key_sohoaroleandpermission "app.test"
+    value: "test"
+  sohoasearchengine:
+    name: &name_sohoasearchengine "sohoa-searchengine-config"
+    key: &key_sohoasearchengine "app.test"
+    value: "test"
+volume:
+  general:
+    volumeMounts:
+      mountPath: "/etc/hosts"
+      name: "vol1"
+      readOnly: "true"
+    volumes:
+      hostPath:
+        path: "/etc/hosts"
+        type: ""
+      name: "vol1"
+  sohoabackend:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoabackend
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoabackend
+        optional: "false"
+      name: "vol2"
+  sohoafrontend:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoafrontend
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoafrontend
+        optional: "false"
+      name: "vol2"
+  sohoafrontendpublic:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoafrontendpublic
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoafrontendpublic
+        optional: "false"
+      name: "vol2"
+  sohoaocr:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoaocr
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoaocr
+        optional: "false"
+      name: "vol2"
+  sohoaroleandpermission:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoaroleandpermission
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoaroleandpermission
+        optional: "false"
+      name: "vol2"
+  sohoasearchengine:
+    volumeMounts:
+      mountPath: "/app/app.test"
+      name: "vol2"
+      subPath: *key_sohoasearchengine
+    volumes:
+      configMap:
+        defaultMode: "0644"
+        name: *name_sohoasearchengine
+        optional: "false"
+      name: "vol2"
+upgradepolicy:
+  strategy:
+    rollingUpdate:
+      maxSurge: "1"
+      maxUnavailable:  "0"
+    type: "RollingUpdate"
+spec:
+  container:
+    securityContext:
+      allowPrivilegeEscalation: "false"
+      capabilities: "{}"
+      privileged: "false"
+      readOnlyRootFilesystem: "false"
+      runAsNonRoot: "false"
+  hostIPC: "false"
+  hostPID: "false"
+redisserver:
+  image:
+    repository: "redis"
+    tag: "alpine"
+    pullPolicy: "Always"
+  name: "redis-server"
+sohoabackend:
+  image:
+    repository: "tupk/sohoa-backend"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-backend"
+sohoafrontend:
+  image:
+    repository: "tupk/sohoa-frontend"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-frontend"
+sohoafrontendpublic:
+  image:
+    repository: "tupk/sohoa-frontend-public"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-frontend-public"
+sohoaocr:
+  image:
+    repository: "tupk/sohoa-ocr"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-ocr"
+sohoaroleandpermission:
+  image:
+    repository: "tupk/sohoa-role-and-permission"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-role-and-permission"
+sohoasearchengine:
+  image:
+    repository: "tupk/sohoa-searchengine"
+    tag: "dev"
+    pullPolicy: "Always"
+  name: "sohoa-searchengine"
+service:
+  sohoafrontendpublic:
+    name: "sohoa-frontend-public-svc"
+    externalIPs: "203.162.141.38"
+    namehttp: "sohoa-frontend-public-svc"
+    http:
+      port: "8005"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"
+  sohoafrontend:
+    name: "sohoa-frontend-svc"
+    externalIPs: "203.162.141.38"
+    namehttp: "	sohoa-frontend-svc"
+    http:
+      port: "4300"
+      protocol: "TCP"
+      targetPort: "80"
+    type: "ClusterIP"   

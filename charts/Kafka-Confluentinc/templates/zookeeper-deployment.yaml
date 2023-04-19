@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.zookeeper.name }}
+  labels:
+    app: {{ .Values.zookeeper.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.zookeeper.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.zookeeper.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.zookeeper.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.zookeeper.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.zookeeper.name }}
+    spec:
+      containers:
+      - name: {{ .Values.zookeeper.name }}
+        image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
+        imagePullPolicy: {{ .Values.zookeeper.image.pullPolicy }}
+        env:
+          - name: ZOOKEEPER_CLIENT_PORT
+            value: {{ .Values.environment.zookeeper.ZOOKEEPERCLIENTPORT | quote }}
+          - name: ZOOKEEPER_TICK_TIME
+            value: {{ .Values.environment.zookeeper.ZOOKEEPERTICKTIME | quote }}

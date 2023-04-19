@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:nginx"]'
+spec:
+  externalIPs:
+  - {{ .Values.nginxsvc.externalIPs }}
+  ports:
+  - name: {{ .Values.nginxsvc.namehttp }}
+    port: {{ .Values.nginxsvc.http.port }}
+    protocol: {{ .Values.nginxsvc.http.protocol }}
+    targetPort: {{ .Values.nginxsvc.http.targetPort }}
+  - name: {{ .Values.nginxsvc.namemqtt }}
+    port: {{ .Values.nginxsvc.mqtt.port }}
+    protocol: {{ .Values.nginxsvc.mqtt.protocol }}
+    targetPort: {{ .Values.nginxsvc.mqtt.targetPort }}
+  type: ClusterIP

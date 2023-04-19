@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.orimxsearch.name }}
+  annotations:
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+    field.cattle.io/targetWorkloadIds: '["deployment:{{.Release.Namespace}}:{{ .Values.orimxsearch.name }}"]'
+spec:
+  externalIPs:
+  - {{ .Values.service.orimxsearch.externalIPs.ip1 }}
+  - {{ .Values.service.orimxsearch.externalIPs.ip2 }}
+  ports:
+  - name: {{ .Values.service.orimxsearch.namehttp }}
+    port: {{ .Values.service.orimxsearch.http.port }}
+    protocol: {{ .Values.service.orimxsearch.http.protocol }}
+    targetPort: {{ .Values.service.orimxsearch.http.targetPort }}
+  type: ClusterIP

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.restproxy.name }}
+  labels:
+    app: {{ .Values.restproxy.name }}
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.restproxy.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.restproxy.name }}
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.restproxy.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.restproxy.name }}
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-{{ .Values.restproxy.name }}
+    spec:
+      containers:
+      - name: {{ .Values.restproxy.name }}
+        image: "{{ .Values.restproxy.image.repository }}:{{ .Values.restproxy.image.tag }}"
+        imagePullPolicy: {{ .Values.restproxy.image.pullPolicy }}
+        env:
+          - name: KAFKA_REST_HOST_NAME
+            value: {{ .Values.environment.restproxy.KAFKARESTHOSTNAME }}
+          - name: KAFKA_REST_BOOTSTRAP_SERVERS
+            value: {{ .Values.environment.restproxy.KAFKARESTBOOTSTRAPSERVERS }}
+          - name: KAFKA_REST_LISTENERS
+            value: {{ .Values.environment.restproxy.KAFKARESTLISTENERS }}
+          - name: KAFKA_REST_SCHEMA_REGISTRY_URL
+            value: {{ .Values.environment.restproxy.KAFKARESTSCHEMAREGISTRYURL }}
