@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coap-adapter
+  labels:
+    app: coap-adapter
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-coap-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coap-adapter
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-coap-adapter
+  template:
+    metadata:
+      labels:
+        app: coap-adapter
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-coap-adapter
+    spec:
+      containers:
+      - name: coap-adapter
+        image: "{{ .Values.coapadapter.image.repository }}:{{ .Values.coapadapter.image.tag }}"
+        imagePullPolicy: {{ .Values.coapadapter.image.pullPolicy }}
+        env:
+          - name: MF_COAP_ADAPTER_LOG_LEVEL
+            value: {{ .Values.coapadapter.logLevel }}
+          - name: MF_COAP_ADAPTER_PORT
+            value: "5683"
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_NATS_URL
+            value: nats://nats:4222
+          - name: MF_THINGS_AUTH_GRPC_URL
+            value: things:8183
+          - name: MF_THINGS_AUTH_GRPC_TIMEOUT
+            value: "1"

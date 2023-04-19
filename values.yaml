@@ -1,0 +1,135 @@
+defaults:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux"
+    tag: "latest"
+databases:
+  postgresql:
+    ip: "203.162.141.3"
+    username: "mainflux"
+    password: "mainflux"
+    port: "5432"
+    db:
+      users: "users"
+      authn: "authn"
+      things: "things"
+  mongodb:
+    ip: "203.162.141.3"
+    port: "27017"
+    db: "messages"
+  redis:
+    ip: "redis-server"
+    port: "6379"
+nginx_internal:
+  mtls:
+    tls: ""
+    intermediate_crt: ""
+vernemq:
+  image:
+    repository: "tupk/mainflux-vernemq"
+    tag: "v0.11.0"
+    pullPolicy: "IfNotPresent"
+  mqtt_port: "1884"
+  ws_port: "7777"
+  logLevel: "debug"
+  name: "vernemq"
+mqttadapter:
+  image:
+    repository: "tupk/mainflux-mqtt"
+    tag: "v0.11.0"
+    pullPolicy: "IfNotPresent"
+  mqtt_port: "1884"
+  ws_port: "7777"
+  logLevel: "debug"
+  name: "mqtt-adapter"
+httpadapter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-http"
+    tag: "v0.11.0"
+  name: "http-adapter"
+coapadapter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-coap"
+    tag: "v0.11.0"
+  name: "coap-adapter"
+users:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-users"
+    tag: "v0.11.0"
+  name: "users"
+things:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-things"
+    tag: "v0.11.0"
+  name: "things"
+authn:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-authn"
+    tag: "v0.11.0"
+  name: "authn"
+mongodbwriter:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-mongodb-writer"
+    tag: "v0.11.0"
+  name: "mongodb-writer"
+mongodbreader:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "tupk/mainflux-mongodb-reader"
+    tag: "v0.11.0"
+  name: "mongodb-reader"
+nats:
+  logLevel: "debug"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "nats"
+    tag: "1.3.0"
+  name: "nats"
+redisserver:
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "redis"
+    tag: "5.0-alpine"
+  name: "redis-server" 
+jaeger:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "jaegertracing/all-in-one"
+    tag: "1.13"
+  name: "jaeger"    
+nginx:
+  logLevel: "info"
+  image:
+    pullPolicy: "IfNotPresent"
+    repository: "nginx"
+    tag: "1.16.0-alpine"
+  name: "nginx"    
+nginxsvc:
+  name: "nginx-svc"
+  externalIPs: "203.162.141.39"
+  namehttp: "nginx-svc-http-port"
+  http:
+    port: "3090"
+    protocol: "TCP"
+    targetPort: "80"
+  namemqtt: "nginx-svc-mqtt-port"
+  mqtt:
+    port: "6893"
+    protocol: "TCP"
+    targetPort: "1883"
+  type: "ClusterIP"

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authn
+  labels:
+    app: authn
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-authn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authn
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-authn
+  template:
+    metadata:
+      labels:
+        app: authn
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-authn
+    spec:
+      containers:
+      - name: authn
+        image: "{{ .Values.authn.image.repository }}:{{ .Values.authn.image.tag }}"
+        imagePullPolicy: {{ .Values.authn.image.pullPolicy }}
+        env:
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_AUTHN_DB
+            value: {{ .Values.databases.postgresql.db.authn }}
+          - name: MF_AUTHN_DB_HOST
+            value: {{ .Values.databases.postgresql.ip }}
+          - name: MF_AUTHN_DB_USER
+            value: {{ .Values.databases.postgresql.username }}
+          - name: MF_AUTHN_DB_PASS
+            value: {{ .Values.databases.postgresql.password }}
+          - name: MF_AUTHN_DB_PORT
+            value: {{ .Values.databases.postgresql.port | quote }}
+          - name: MF_AUTHN_GRPC_PORT
+            value: "8181"
+          - name: MF_AUTHN_HTTP_PORT
+            value: "8189"
+          - name: MF_AUTHN_LOG_LEVEL
+            value: debug
+          - name: MF_AUTHN_SECRET
+            value: secret

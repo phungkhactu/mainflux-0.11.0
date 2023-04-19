@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-adapter
+  labels:
+    app: mqtt-adapter
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-adapter
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter
+  template:
+    metadata:
+      labels:
+        app: mqtt-adapter
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-mqtt-adapter
+    spec:
+      containers:
+      - name: mqtt-adapter
+        image: "{{ .Values.mqttadapter.image.repository }}:{{ .Values.mqttadapter.image.tag }}"
+        imagePullPolicy: {{ .Values.mqttadapter.image.pullPolicy }}
+        env:
+          - name: MF_MQTT_ADAPTER_ES_URL
+            value: "{{ .Values.databases.redis.ip }}:{{ .Values.databases.redis.port }}"
+          - name: MF_MQTT_ADAPTER_LOG_LEVEL
+            value: {{ .Values.mqttadapter.logLevel }}
+          - name: MF_NATS_URL
+            value: nats://nats:4222
+          - name: MF_THINGS_AUTH_GRPC_URL
+            value: http://things:8183
+          - name: MF_MQTT_ADAPTER_MQTT_PORT
+            value: "1883"
+          - name: MF_MQTT_ADAPTER_WS_PORT
+            value: "8080"
+          - name: MF_MQTT_ADAPTER_MQTT_TARGET_HOST
+            value: vernemq
+          - name: MF_MQTT_ADAPTER_MQTT_TARGET_PORT
+            value: "1883"
+          - name: MF_MQTT_ADAPTER_WS_TARGET_HOST
+            value: vernemq
+          - name: MF_MQTT_ADAPTER_WS_TARGET_PORT
+            value: "8080"
+          - name: MF_JAEGER_URL
+            value: jaeger:6831
+          - name: MF_THINGS_AUTH_GRPC_TIMEOUT
+            value: "1"

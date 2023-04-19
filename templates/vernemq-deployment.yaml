@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vernemq
+  labels:
+    app: vernemq
+    workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-vernemq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vernemq
+      workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-vernemq
+  template:
+    metadata:
+      labels:
+        app: vernemq
+        workload.user.cattle.io/workloadselector: deployment-{{.Release.Namespace}}-vernemq
+    spec:
+      containers:
+      - name: vernemq
+        image: "{{ .Values.vernemq.image.repository }}:{{ .Values.vernemq.image.tag }}"
+        imagePullPolicy: {{ .Values.vernemq.image.pullPolicy }}
+        env:
+          - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
+            value: "on"
+          - name: DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL
+            value: "error"
